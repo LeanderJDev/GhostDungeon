@@ -3,10 +3,20 @@
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_4wcc8"]
 [ext_resource type="Script" uid="uid://b3eg7xdljt337" path="res://assets/scripts/character/PlayerController.cs" id="1_s027a"]
 [ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="2_14505"]
-[ext_resource type="PackedScene" uid="uid://c2vdvaj36c6so" path="res://assets/scenes/projectile.tscn" id="3_4wcc8"]
+[ext_resource type="Texture2D" uid="uid://ccsh3n4twpwlt" path="res://assets/art/neutral_point_light.webp" id="4_4wcc8"]
 
 [node name="CharacterBody2D" instance=ExtResource("1_4wcc8")]
 script = ExtResource("1_s027a")
 ghost = ExtResource("2_14505")
 immortal = false
-projectile = ExtResource("3_4wcc8")
+
+[node name="PointLight2D" type="PointLight2D" parent="." index="1"]
+show_behind_parent = true
+position = Vector2(0, -4)
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 1)
+texture = ExtResource("4_4wcc8")
+
+[node name="Sprite2D" parent="." index="2"]
+modulate = Color(1, 1, 1, 1)
+light_mask = 2

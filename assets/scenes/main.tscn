@@ -10,11 +10,15 @@ y_sort_enabled = true
 [node name="WorldGenerator" parent="." instance=ExtResource("3_dfgan")]
 y_sort_enabled = true
 position = Vector2(0, -1)
-roomCount = 12
+roomCount = 4
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)
 script = ExtResource("2_dfgan")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
+color = Color(0.190762, 0.190762, 0.190762, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

@@ -252,14 +252,14 @@ public partial class WorldGenerator : Node2D
                 Vector2I roomB = generatedRooms[j];
                 Vector2? startA = FindWalkableInRoom(roomA);
                 Vector2? startB = FindWalkableInRoom(roomB);
-                GD.Print($"Trying Start positions: {startA}, {startB}");
+
                 if (startA == null || startB == null)
                 {
                     GD.PrintErr($"No walkable position found in room {roomA} or {roomB}");
                     continue;
                 }
                 List<Vector2> path = APlusPathfinder.Instance.Calculate(startA.Value, startB.Value);
-                GD.Print($"Path from {roomA} to {roomB}: {path?.Count} nodes");
+
                 if (path != null && path.Count > maxDistance)
                 {
                     maxDistance = path.Count;
@@ -271,7 +271,7 @@ public partial class WorldGenerator : Node2D
                 }
             }
         }
-        if (maxDistance < 0)
+        if (maxDistance < 1)
         {
             GD.PrintErr("No valid path between any two rooms.");
             return;
@@ -526,12 +526,6 @@ public partial class WorldGenerator : Node2D
                     BatchTileForTerrain(pos);
             }
         }
-        walls.SetCell(new Vector2I(position.X, position.Y), 1, (Vector2I)doorCoords[open * 2]);
-        walls.SetCell(
-            new Vector2I(position.X + direction.X, position.Y + direction.Y),
-            1,
-            (Vector2I)doorCoords[open * 2 + 1]
-        );
     }
 
     private bool GenerateRoom(Vector2I position)

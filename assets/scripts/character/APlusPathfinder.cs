@@ -102,6 +102,21 @@ public partial class APlusPathfinder : Node2D
         return new DebugStruct { path = Calculate(start, target), closedList = lastClosedList };
     }
 
+    public bool IsTileWalkable(Vector2 position)
+    {
+        Vector2I node = tileMap.LocalToMap(position);
+        if (tileMap.GetCellSourceId(node) == -1)
+            return false; // Kein Tile vorhanden
+        if (tileMap.GetCellSourceId(node) > 0)
+            return true; // Türen immer als begehbar betrachten
+        TileData wallTileData = tileMap.GetCellTileData(node);
+        if (wallTileData != null)
+        {
+            return WorldGenerator.CheckSpace(tileMap, node);
+        }
+        return false;
+    }
+
     // Neue Nachbarsfunktion für Vector2I
     private List<Vector2I> GetWalkableNeighboursSimple(Vector2I node)
     {

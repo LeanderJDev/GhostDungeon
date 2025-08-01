@@ -5,14 +5,12 @@ using Godot;
 
 /*
 Raycast Vision
+Wandering
 */
 public partial class EnemyController : CharacterController
 {
     [Export]
     public int EnemyType;
-
-    [Export]
-    public float DetectionRange = 200f;
 
     [Export]
     public float ShootRange = 100f;
@@ -27,112 +25,310 @@ public partial class EnemyController : CharacterController
     private float lastPlayerPathTargetDistance = 0f;
     private const float RepathDistanceThreshold = 32f;
 
-    public override void _Ready()
-    {
-        if (player == null)
-        {
-            player = PlayerController.Instance;
-        }
-        base._Ready();
-    }
+    // Für zufälliges Wandern (Deklarationen entfernt, da bereits vorhanden)
 
+    // Letzte bekannte Spielerposition (für Suchen nach Sichtverlust)
+    private Vector2? lastKnownPlayerPosition = null;
+
+    private List<Vector2> wanderPath = null;
+    private int wanderPathIndex = 0;
+    private Random wanderRng = null;
+    private float wanderTimer = 0f;
+    private float wanderTimeout = 0f;
+    private const float MaxWanderTimeout = 5f; // Sekunden bis Abbruch
+
+    // ...entfernt, neue Version weiter unten...
     public override void _PhysicsProcess(double delta)
     {
-        if (player == null)
-        {
-            GD.Print("Player not set");
-            player = PlayerController.Instance;
-        }
-        Vector2 toPlayer = player.GlobalPosition - GlobalPosition;
-        float distance = toPlayer.Length();
-
+        EnsurePlayerReference();
         shootTimer -= (float)delta;
 
-        if (distance <= DetectionRange)
+        if (HasLineOfSightToPlayer())
         {
-            switch (EnemyType)
+            lastKnownPlayerPosition = player.Position;
+            HandleEngagePlayer(delta);
+        }
+        else if (lastKnownPlayerPosition != null)
+        {
+            if (MoveToTarget(lastKnownPlayerPosition.Value, delta, 2f))
             {
-                case 0: // Walk towards player
-                    MovePath();
-                    break;
-                case 1: // Shoot towards player
-                    if (distance <= ShootRange)
-                    {
-                        CancelPath();
-                        if (shootTimer <= 0f)
-                        {
-                            Shoot(toPlayer.Normalized());
-                            shootTimer = ShootInterval;
-                        }
-                    }
-                    else
-                    {
-                        MovePath();
-                    }
-                    break;
+                lastKnownPlayerPosition = null;
+                CancelPath();
+                WanderRandomly(delta);
             }
         }
         else
         {
-            CancelPath();
+            WanderRandomly(delta);
         }
-
         base._PhysicsProcess(delta);
     }
 
-    private void CancelPath()
+    // Spieler verfolgen oder schießen
+    // ...entfernt, neue Version weiter unten...
+    private void HandleEngagePlayer(double delta)
     {
-        currentPath = new List<Vector2>();
-        moveDirection = Vector2.Zero;
+        Vector2 toPlayer = player.GlobalPosition - GlobalPosition;
+        float distance = toPlayer.Length();
+        if (EnemyType == 0)
+        {
+            MoveToTarget(player.Position, delta);
+        }
+        else if (EnemyType == 1)
+        {
+            if (distance <= ShootRange)
+            {
+                CancelPath();
+                TryShoot(toPlayer);
+            }
+            else
+            {
+                MoveToTarget(player.Position, delta);
+            }
+        }
     }
 
-    private void MovePath()
+    private void TryShoot(Vector2 direction)
     {
-        float margin = 2f;
-        // Wenn kein Pfad vorhanden, neuen berechnen
-        if (currentPath.Count == 0)
+        if (shootTimer <= 0f)
         {
-            currentPath = APlusPathfinder.Instance.Calculate(Position, player.Position);
-            pathIndex = 0;
-            if (currentPath.Count == 0)
-                return;
+            Shoot(direction.Normalized());
+            shootTimer = ShootInterval;
         }
+    }
 
-        // Zielpunkt bestimmen
-        if (pathIndex >= currentPath.Count)
-            pathIndex = currentPath.Count - 1;
-        Vector2 targetPosition = currentPath[pathIndex];
-
-        // Die Distanz für Repath wird zum letzten Punkt des Pfads (dem Ziel) gemessen
-        Vector2 pathTarget = currentPath.Last();
-        float playerToPathTarget = player.Position.DistanceTo(pathTarget);
-        if (playerToPathTarget > RepathDistanceThreshold)
+    // Allgemeine Zielverfolgung (auch für letzte bekannte Position)
+    // Gibt true zurück, wenn Ziel erreicht
+    // ...entfernt, neue Version weiter unten...
+    private bool MoveToTarget(Vector2 target, double delta, float margin = 2f)
+    {
+        if (NeedsNewPath(target))
         {
-            // Spieler ist zu weit weg vom Ziel des aktuellen Pfads, neuen Pfad berechnen
-            currentPath = APlusPathfinder.Instance.Calculate(Position, player.Position);
+            currentPath = APlusPathfinder.Instance.Calculate(Position, target);
             pathIndex = 0;
             if (currentPath.Count == 0)
             {
                 moveDirection = Vector2.Zero;
-                return;
+                return false;
             }
-            targetPosition = currentPath[pathIndex];
         }
-
+        if (pathIndex >= currentPath.Count)
+            pathIndex = currentPath.Count - 1;
+        Vector2 targetPosition = currentPath[pathIndex];
         Vector2 direction = targetPosition - Position;
         if (direction.Length() < margin)
         {
             pathIndex++;
             if (pathIndex >= currentPath.Count)
             {
-                // Ziel erreicht
                 moveDirection = Vector2.Zero;
                 currentPath.Clear();
-                return;
+                TryStepAwayFromWall();
+                return true;
             }
             targetPosition = currentPath[pathIndex];
             direction = targetPosition - Position;
         }
         moveDirection = direction.Normalized();
+        return false;
+    }
+
+    private bool NeedsNewPath(Vector2 target)
+    {
+        return currentPath.Count == 0
+            || (
+                currentPath.Count > 0
+                && currentPath.Last().DistanceTo(target) > RepathDistanceThreshold
+            );
+    }
+
+    // ...entfernt, neue Version weiter unten...
+    private void CancelPath()
+    {
+        currentPath.Clear();
+        moveDirection = Vector2.Zero;
+        TryStepAwayFromWall();
+    }
+
+    // ...entfernt, neue Version weiter unten...
+    // Für Kompatibilität, falls noch irgendwo aufgerufen
+    private void MovePath()
+    {
+        if (currentPath.Count == 0)
+            return;
+        MoveToTarget(currentPath.Last(), 0);
+    }
+
+    // Prüft, ob eine direkte Sichtlinie zum Spieler besteht (Raycast auf Layer 1)
+    // ...entfernt, neue Version weiter unten...
+    private bool HasLineOfSightToPlayer()
+    {
+        var space = GetWorld2D().DirectSpaceState;
+        var playerPos = player.GlobalPosition;
+        float radius = 4f;
+        Vector2[] offsets = new Vector2[]
+        {
+            Vector2.Zero,
+            new Vector2(-radius, 0),
+            new Vector2(radius, 0),
+            new Vector2(0, -radius),
+            new Vector2(0, radius),
+        };
+        foreach (var offset in offsets)
+        {
+            Vector2 target = playerPos + offset;
+            if (RayHitsPlayer(target, space))
+                return true;
+        }
+        return false;
+    }
+
+    private bool RayHitsPlayer(Vector2 target, PhysicsDirectSpaceState2D space)
+    {
+        var query = PhysicsRayQueryParameters2D.Create(GlobalPosition, target);
+        query.CollisionMask = (1 << 1) | (1 << 2);
+        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var result = space.IntersectRay(query);
+        if (result.Count == 0)
+            return false;
+        if (result.TryGetValue("collider", out var collider))
+        {
+            Node colliderNode = ((Godot.Variant)collider).As<Node>();
+            if (colliderNode != null && colliderNode.GetInstanceId() == player.GetInstanceId())
+                return true;
+        }
+        return false;
+    }
+
+    // Entfernt, da optimierte Version weiter unten
+    private void WanderRandomly(double delta)
+    {
+        const int minWanderInterval = 1;
+        const int maxWanderInterval = 4;
+        const int maxAttempts = 10;
+        const int maxWanderDistance = 3; // maximale Pfadlänge
+        wanderRng ??= new Random();
+
+        if (wanderPath == null || wanderPath.Count == 0)
+        {
+            if (HandleWanderTimer(delta, minWanderInterval, maxWanderInterval))
+                return;
+            TryGenerateWanderPath(
+                maxAttempts,
+                maxWanderDistance,
+                minWanderInterval,
+                maxWanderInterval
+            );
+            if (wanderPath == null || wanderPath.Count == 0)
+                return;
+        }
+
+        wanderTimeout -= (float)delta;
+        if (wanderTimeout <= 0f)
+        {
+            wanderPath = null;
+            moveDirection = Vector2.Zero;
+            wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
+            TryStepAwayFromWall();
+            return;
+        }
+
+        if (wanderPath != null && wanderPathIndex < wanderPath.Count)
+        {
+            Vector2 target = wanderPath[wanderPathIndex];
+            Vector2 dir = target - Position;
+            if (dir.Length() < 1f)
+            {
+                wanderPathIndex++;
+                if (wanderPathIndex >= wanderPath.Count)
+                {
+                    wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
+                    wanderPath = null;
+                    moveDirection = Vector2.Zero;
+                    TryStepAwayFromWall();
+                    return;
+                }
+                target = wanderPath[wanderPathIndex];
+                dir = target - Position;
+            }
+            moveDirection = dir.Normalized();
+        }
+        else
+        {
+            wanderPath = null;
+            moveDirection = Vector2.Zero;
+            TryStepAwayFromWall();
+        }
+    }
+
+    private bool HandleWanderTimer(double delta, int minWanderInterval, int maxWanderInterval)
+    {
+        if (wanderTimer > 0f)
+        {
+            wanderTimer -= (float)delta;
+            moveDirection = Vector2.Zero;
+            TryStepAwayFromWall();
+            return true;
+        }
+        return false;
+    }
+
+    private void TryGenerateWanderPath(
+        int maxAttempts,
+        int maxWanderDistance,
+        int minWanderInterval,
+        int maxWanderInterval
+    )
+    {
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            float angle = (float)(wanderRng.NextDouble() * Math.PI * 2);
+            Vector2 candidateTarget =
+                Position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * maxWanderDistance * 16;
+
+            if (!APlusPathfinder.Instance.IsTileWalkable(candidateTarget))
+                continue;
+            var candidatePath = APlusPathfinder.Instance.Calculate(Position, candidateTarget);
+            if (candidatePath != null && candidatePath.Count > 1)
+            {
+                int cropLen = Math.Min(maxWanderDistance, candidatePath.Count);
+                wanderPath = candidatePath.GetRange(0, cropLen);
+                wanderPathIndex = 0;
+                wanderTimeout = MaxWanderTimeout;
+                return;
+            }
+        }
+        wanderPath = null;
+        wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
+        moveDirection = Vector2.Zero;
+        TryStepAwayFromWall();
+    }
+
+    // Versucht, den Gegner von angrenzenden Wänden wegzubewegen, damit er frei schießen kann
+    // Entfernt, da optimierte Version weiter unten
+    private void TryStepAwayFromWall()
+    {
+        foreach (var dir in WorldGenerator.eightNeighbourDirections)
+        {
+            Vector2 checkPos = Position + dir * 16;
+            if (!APlusPathfinder.Instance.IsTileWalkable(checkPos))
+            {
+                Vector2 awayPos = Position - dir * 16;
+                if (APlusPathfinder.Instance.IsTileWalkable(awayPos))
+                {
+                    moveDirection = (awayPos - Position).Normalized();
+                    return;
+                }
+            }
+        }
+    }
+
+    private void EnsurePlayerReference()
+    {
+        if (player == null)
+        {
+            GD.Print("Player not set");
+            player = PlayerController.Instance;
+        }
     }
 }
