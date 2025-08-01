@@ -13,21 +13,21 @@ public partial class YourRunRestartsHere : Control
 		GetChild(0).SetProcess(false);
 	}
 
-	//vom Signal aufgerufen!
-	private void ButtonPressed()
+    //vom Signal aufgerufen!
+    private void ButtonPressed()
 	{
-		RestartGame();
+		MetaMain.RestartWithSameSeed();
 	}
 
 	public void PlayerDead()
 	{
 		((Control)GetChild(0)).Visible = true;
 		GetChild(0).SetProcess(true);
-
 	}
 
-	public void RestartGame()
+    //vom Signal aufgerufen!
+    private void ButtonPressedGiveUp()
 	{
-		GetTree().ReloadCurrentScene();
-	}
+        MetaMain.RestartWithDifferentSeed();
+    }
 }

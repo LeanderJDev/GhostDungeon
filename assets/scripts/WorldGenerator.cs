@@ -49,12 +49,14 @@ public partial class WorldGenerator : Node2D
 
     private int generatedRoomCount = 0;
 
+    public static int Seed;
+
     private TileSet tileSet;
     private TileMapPattern groundSquarePattern;
     private TileMapPattern[] roomChoices;
     private Queue<Vector2I> generationQueue = new();
     private List<Vector2I> generatedRooms = new();
-    private Random random = new();
+    private Random random = new(Seed);
 
     // Speichert das Spielerraum für Enemy-Spawn-Exklusion
     private Vector2I? playerRoomSaved = null;
@@ -79,9 +81,19 @@ public partial class WorldGenerator : Node2D
         new Vector2I(-1, 1),
     };
 
-    public override void _Ready()
+    public WorldGenerator()
     {
         Instance = this;
+    }
+
+    public override void _ExitTree()
+    {
+        Instance = null;
+        base._ExitTree();
+    }
+
+    public override void _Ready()
+    {
         base._Ready();
         if (walls == null)
         {
@@ -581,6 +593,8 @@ public partial class WorldGenerator : Node2D
             Vector2I worldPos = position + cell;
             int sourceId = pattern.GetCellSourceId(cell);
             Vector2I atlasCoords = pattern.GetCellAtlasCoords(cell);
+            if (sourceId == -1)
+                GD.Print(position);
             if (!IsValidTile(sourceId, atlasCoords))
             {
                 GD.PrintErr(

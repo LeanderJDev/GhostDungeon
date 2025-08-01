@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://cketwg4mkdccm"]
+
+[ext_resource type="Script" uid="uid://yns72vg2la71" path="res://assets/scripts/character/MetaMain.cs" id="1_w5kng"]
+[ext_resource type="PackedScene" uid="uid://de7qkn4pdxk57" path="res://assets/scenes/main.tscn" id="2_8fi1s"]
+
+[node name="metaMain" type="Node2D"]
+script = ExtResource("1_w5kng")
+mainScene = ExtResource("2_8fi1s")

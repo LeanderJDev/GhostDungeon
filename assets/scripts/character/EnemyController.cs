@@ -41,6 +41,8 @@ public partial class EnemyController : CharacterController
     public override void _PhysicsProcess(double delta)
     {
         EnsurePlayerReference();
+        if (player == null)
+            return;
         shootTimer -= (float)delta;
 
         if (HasLineOfSightToPlayer())

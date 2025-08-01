@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using Godot;
 using Musikspieler.Scripts.RecordView;
 
@@ -10,6 +9,8 @@ public partial class CharacterController : CharacterBody2D
 {
     [Export]
     public PackedScene projectile;
+
+    public bool isDead;
 
     [Export]
     public Node2D itemDisplayContainer;
@@ -145,6 +146,7 @@ public partial class CharacterController : CharacterBody2D
 
     public void Kill()
     {
+        isDead = true;
         if (this is PlayerController player)
         {
             GD.Print("Dead");

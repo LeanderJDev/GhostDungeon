@@ -6,16 +6,14 @@ public partial class CameraController : Camera2D
 {
     [Export]
     public int Speed = 10;
-    private Node2D Target;
 
     public override void _PhysicsProcess(double delta)
     {
-        if (Target == null)
-        {
-            Target = PlayerController.Instance;
+        if (PlayerController.Instance != null && !IsInstanceValid(PlayerController.Instance))
             return;
-        }
         base._Process(delta);
-        Position = Position.Lerp(Target.Position, (float)(Speed * delta));
+        if (PlayerController.Instance == null)
+            return;
+        Position = Position.Lerp(PlayerController.Instance.Position, (float)(Speed * delta));
     }
 }

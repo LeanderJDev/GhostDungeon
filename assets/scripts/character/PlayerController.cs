@@ -35,8 +35,16 @@ public partial class PlayerController : CharacterController
         base._Ready();
     }
 
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+        _instance = null;
+    }
+
     public override void _Process(double delta)
     {
+        if (isDead) return;
+
         Vector2 direction = Input.GetVector("Left", "Right", "Up", "Down");
 
         moveDirection = direction;
