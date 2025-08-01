@@ -1,6 +1,5 @@
-[gd_scene load_steps=4 format=3 uid="uid://de7qkn4pdxk57"]
+[gd_scene load_steps=3 format=3 uid="uid://de7qkn4pdxk57"]
 
-[ext_resource type="PackedScene" uid="uid://d4bpnqcmrp5wd" path="res://assets/scenes/player.tscn" id="1_kpi06"]
 [ext_resource type="Script" uid="uid://72etv41p3aly" path="res://assets/scripts/CameraController.cs" id="2_dfgan"]
 [ext_resource type="PackedScene" uid="uid://cb38sob6butyy" path="res://assets/scenes/world_generator.tscn" id="3_dfgan"]
 
@@ -12,10 +11,6 @@ y_sort_enabled = true
 position = Vector2(0, -1)
 roomCount = 12
 
-[node name="Player" parent="." instance=ExtResource("1_kpi06")]
-position = Vector2(27, 41)
-
-[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("Target")]
+[node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)
 script = ExtResource("2_dfgan")
-Target = NodePath("../Player")

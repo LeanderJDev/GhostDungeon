@@ -63,7 +63,7 @@ public partial class APlusPathfinder : Node2D
                 Vector2I? step = current;
                 while (step != null)
                 {
-                    path.Insert(0, tileMap.MapToLocal(step.Value));
+                    path.Insert(0, tileMap.ToGlobal(tileMap.MapToLocal(step.Value)));
                     step = cameFrom[step.Value];
                 }
                 // GD.Print("Path found");
@@ -110,8 +110,10 @@ public partial class APlusPathfinder : Node2D
         {
             Vector2I direction = WorldGenerator.neighbourDirections[i];
             Vector2I position = node + direction;
-            if (tileMap.GetCellSourceId(position) > 0)
+            if (tileMap.GetCellSourceId(position) == -1)
                 continue; // Kein Tile vorhanden
+            if (tileMap.GetCellSourceId(position) > 0)
+                neighbours.Add(position); // Türen immer als begehbar betrachten
             TileData wallTileData = tileMap.GetCellTileData(position);
             if (wallTileData != null)
             {

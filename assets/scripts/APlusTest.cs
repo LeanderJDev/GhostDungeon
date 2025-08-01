@@ -61,7 +61,6 @@ public partial class APlusTest : Node2D
             {
                 Vector2 mousePos = GetGlobalMousePosition();
                 draggedMarker.GlobalPosition = mousePos;
-                UpdatePath();
             }
         }
     }
@@ -71,31 +70,29 @@ public partial class APlusTest : Node2D
         if (startMarker == null || targetMarker == null || visulaiseLayer == null)
             return;
         currentResult = APlusPathfinder.Instance.DebugCalculate(
-            startMarker.GlobalPosition + 16000 * Vector2I.One,
-            targetMarker.GlobalPosition + 16000 * Vector2I.One
+            startMarker.GlobalPosition,
+            targetMarker.GlobalPosition
         );
-        QueueRedraw();
-    }
 
-    public override void _Draw()
-    {
-        base._Draw();
-        Vector2 from = startMarker.GlobalPosition;
-        Vector2 to = targetMarker.GlobalPosition;
-        DrawLine(from, to, Colors.Red, 10);
+        // Visualisierung der Tiles auf dem TileMapLayer
         visulaiseLayer.Clear();
         visulaiseLayer.SetCell(Vector2I.Zero, 0, new Vector2I(0, 0));
         // Draw open and closed nodes as tiles on the tilemap
         foreach (var node in currentResult.closedList)
         {
-            visulaiseLayer.SetCell(node.position - Vector2I.One * 16000, 0, new Vector2I(4, 0));
+            visulaiseLayer.SetCell(node.position, 0, new Vector2I(4, 0));
         }
         if (currentResult.path != null && currentResult.path.Count > 1)
         {
+            GD.Print($"Path found with {currentResult.path.Count} nodes.");
             // Visualize the path with tiles using AtlasCoord (3,0)
             foreach (Vector2 pos in currentResult.path)
             {
-                visulaiseLayer.SetCell((Vector2I)pos - Vector2I.One * 16000, 0, new Vector2I(3, 0));
+                visulaiseLayer.SetCell(
+                    (Vector2I)visulaiseLayer.LocalToMap(pos),
+                    0,
+                    new Vector2I(3, 0)
+                );
             }
         }
     }

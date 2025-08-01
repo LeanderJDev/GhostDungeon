@@ -31,6 +31,9 @@ public partial class WorldGenerator : Node2D
     public PackedScene[] enemies;
 
     [Export]
+    public PackedScene player;
+
+    [Export]
     public Vector2[] horizontalDoorCoords;
 
     [Export]
@@ -95,6 +98,9 @@ public partial class WorldGenerator : Node2D
             return;
         }
 
+        GD.Print($"Found {roomChoices.Length} room patterns in TileSet.");
+        GD.Print("Starting world generation...");
+
         StartGeneration();
     }
 
@@ -102,7 +108,7 @@ public partial class WorldGenerator : Node2D
 
     private void StartGeneration()
     {
-        tries = 5;
+        tries = 3;
         generatedRooms.Clear();
         GenerateRooms(Vector2I.Zero);
     }
@@ -118,18 +124,31 @@ public partial class WorldGenerator : Node2D
         generationQueue.Clear();
         generationQueue.Enqueue(position);
 
-        while (generationQueue.Count > 0)
+        int maxRoomIterations = roomCount * 6;
+        int roomIterations = 0;
+        while (generationQueue.Count > 0 && roomIterations < maxRoomIterations)
         {
+            roomIterations++;
             Vector2I pos = generationQueue.Dequeue();
             if (!GenerateRoom(pos))
+            {
                 continue;
-            generatedRooms.Add(pos);
+            }
             generatedRoomCount++;
+            generatedRooms.Add(pos);
+            roomIterations++;
             if (generatedRoomCount == roomCount)
                 break;
         }
+        if (roomIterations >= maxRoomIterations)
+        {
+            GD.PrintErr(
+                $"Aborted GenerateRooms after {maxRoomIterations} iterations to prevent infinite loop."
+            );
+        }
         sw.Stop();
         GD.Print($"[Time] GenerateRooms: {sw.ElapsedMilliseconds} ms");
+
         if (generatedRoomCount != roomCount)
         {
             tries--;
@@ -174,11 +193,95 @@ public partial class WorldGenerator : Node2D
         GD.Print($"[Time] UpdateTiles: {sw.ElapsedMilliseconds} ms");
 
         sw.Restart();
+        SpawnPlayer();
+        sw.Stop();
+        GD.Print($"[Time] SpawnPlayer: {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
         SpawnEnemies();
         sw.Stop();
         GD.Print($"[Time] SpawnEnemies: {sw.ElapsedMilliseconds} ms");
-
         GD.Print("Done");
+    }
+
+    // Sucht die beiden am weitesten entfernten Räume mit Pfad und spawnt Spieler/markiert Schatzraum
+    private void SpawnPlayer()
+    {
+        if (generatedRooms.Count < 2)
+        {
+            GD.PrintErr("Not enough rooms to spawn player and treasure.");
+            return;
+        }
+        int maxDistance = -1;
+        List<Vector2> bestPath = null;
+        Vector2I playerRoom = generatedRooms[0];
+        Vector2I treasureRoom = generatedRooms[1];
+        Vector2 playerStart = Vector2.Zero;
+        Vector2 treasureStart = Vector2.Zero;
+        // Hilfsfunktion: finde begehbare Position im Raum
+        Vector2? FindWalkableInRoom(Vector2I room)
+        {
+            for (int x = 1; x < roomSize.X - 1; x++)
+            {
+                for (int y = 1; y < roomSize.Y - 1; y++)
+                {
+                    Vector2I pos = room + new Vector2I(x, y);
+                    if (CheckSpace(walls, pos))
+                    {
+                        var tileData = walls.GetCellTileData(pos);
+                        if (tileData != null && tileData.TerrainSet == 0 && tileData.Terrain == 1)
+                            return (Vector2)walls.MapToLocal(pos);
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Vergleiche alle Raum-Paare
+        for (int i = 0; i < generatedRooms.Count; i++)
+        {
+            for (int j = i + 1; j < generatedRooms.Count; j++)
+            {
+                Vector2I roomA = generatedRooms[i];
+                Vector2I roomB = generatedRooms[j];
+                Vector2? startA = FindWalkableInRoom(roomA);
+                Vector2? startB = FindWalkableInRoom(roomB);
+                GD.Print($"Trying Start positions: {startA}, {startB}");
+                if (startA == null || startB == null)
+                {
+                    GD.PrintErr($"No walkable position found in room {roomA} or {roomB}");
+                    continue;
+                }
+                List<Vector2> path = APlusPathfinder.Instance.Calculate(startA.Value, startB.Value);
+                GD.Print($"Path from {roomA} to {roomB}: {path?.Count} nodes");
+                if (path != null && path.Count > maxDistance)
+                {
+                    maxDistance = path.Count;
+                    bestPath = path;
+                    playerRoom = roomA;
+                    treasureRoom = roomB;
+                    playerStart = startA.Value;
+                    treasureStart = startB.Value;
+                }
+            }
+        }
+        if (maxDistance < 0)
+        {
+            GD.PrintErr("No valid path between any two rooms.");
+            return;
+        }
+        // Spieler spawnen
+        Node2D playerNode = (Node2D)player.Instantiate();
+        Vector2 playerPos = bestPath[0];
+        playerNode.Position = playerPos;
+        GetParent().CallDeferred("add_child", playerNode);
+        // Schatzraum markieren (z.B. als Property oder Print)
+        GD.Print($"Treasure room at {treasureRoom}");
+        GD.Print($"Treasure spawn at {treasureStart}");
+        GD.Print($"Player room at {playerRoom}");
+        GD.Print($"Player spawn at {playerPos}");
+        walls.SetCell((Vector2I)walls.LocalToMap(treasureStart), 0, new Vector2I(14, 6));
+        // Optional: Hier könnte man ein Property setzen oder ein Objekt spawnen
     }
 
     private void CloseDoors()
@@ -281,14 +384,19 @@ public partial class WorldGenerator : Node2D
         foreach (Vector2I room in generatedRooms)
         {
             int enemyCount = random.Next(4);
-            while (enemyCount > 0)
+            int maxEnemyTries = roomCount * 6;
+            int tries = 0;
+            while (enemyCount > 0 && tries < maxEnemyTries)
             {
                 int x = random.Next(1, roomSize.X - 1);
                 int y = random.Next(1, roomSize.Y - 1);
                 Vector2I localPos = new Vector2I(x, y);
                 Vector2I worldPos = room + localPos;
                 if (!CheckSpace(walls, worldPos))
+                {
+                    tries++;
                     continue;
+                }
                 if (enemies.Length > 0)
                 {
                     var enemyScene = enemies[random.Next(enemies.Length)];
@@ -297,6 +405,13 @@ public partial class WorldGenerator : Node2D
                     GetParent().CallDeferred("add_child", enemy);
                     enemyCount--;
                 }
+                tries++;
+            }
+            if (tries >= maxEnemyTries && enemyCount > 0)
+            {
+                GD.PrintErr(
+                    $"SpawnEnemies: Aborted after {maxEnemyTries} tries in room {room}, {enemyCount} enemies not spawned."
+                );
             }
         }
     }

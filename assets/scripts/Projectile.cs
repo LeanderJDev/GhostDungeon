@@ -6,7 +6,7 @@ public partial class Projectile : CharacterBody2D
 {
     private int speed = 200;
     private Vector2 direction;
-    private int maxBounce = 3;
+    private int maxBounce = 100;
 
     public override void _Ready()
     {
