@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=36 format=3 uid="uid://cse12k2t6be7v"]
+[gd_resource type="TileSet" load_steps=34 format=3 uid="uid://cse12k2t6be7v"]
 
 [ext_resource type="Texture2D" uid="uid://1fk05jfx0fb1" path="res://assets/art/tiles.png" id="1_7oh2i"]
 [ext_resource type="Texture2D" uid="uid://syyou4wxc3uo" path="res://assets/art/Tueren1.png" id="2_3jwfw"]
@@ -45,12 +45,6 @@ tile_data = PackedInt32Array(0, 262144, 2, 65536, 655360, 0, 131072, 655360, 0, 
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_3jwfw"]
 polygon = PackedVector2Array(-8, -24, 8, -24, 8, 8, -8, 8)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_njnbi"]
-polygon = PackedVector2Array(-8, -4, 8, -4, 8, 8, -8, 8)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_o3l5f"]
-polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_akk8s"]
 polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
@@ -999,14 +993,12 @@ texture = ExtResource("1_7oh2i")
 14:6/0 = 0
 14:6/0/modulate = Color(0.737193, 0.737193, 0.737193, 1)
 14:6/0/y_sort_origin = -8
-14:6/0/occlusion_layer_0/polygon_0/polygon = SubResource("OccluderPolygon2D_njnbi")
 14:6/0/custom_data_1 = "chest"
 15:6/size_in_atlas = Vector2i(1, 2)
 15:6/0 = 0
 15:6/0/texture_origin = Vector2i(0, 8)
 15:6/0/modulate = Color(0.737193, 0.737193, 0.737193, 1)
 15:6/0/y_sort_origin = -8
-15:6/0/occlusion_layer_0/polygon_0/polygon = SubResource("OccluderPolygon2D_o3l5f")
 15:6/0/custom_data_1 = "openchest"
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_bxvxy"]
