@@ -1,0 +1,11 @@
+[gd_scene load_steps=5 format=3 uid="uid://d4bpnqcmrp5wd"]
+
+[ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_4wcc8"]
+[ext_resource type="Script" uid="uid://b3eg7xdljt337" path="res://assets/scripts/character/PlayerController.cs" id="1_s027a"]
+[ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="2_14505"]
+[ext_resource type="PackedScene" uid="uid://c2vdvaj36c6so" path="res://assets/scenes/projectile.tscn" id="3_4wcc8"]
+
+[node name="CharacterBody2D" instance=ExtResource("1_4wcc8")]
+script = ExtResource("1_s027a")
+ghost = ExtResource("2_14505")
+projectile = ExtResource("3_4wcc8")

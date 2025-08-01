@@ -1,0 +1,147 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using Godot;
+
+public partial class APlusPathfinder : Node2D
+{
+    [Export]
+    public TileMapLayer ground;
+
+    [Export]
+    public TileMapLayer walls;
+
+    private static APlusPathfinder _instance;
+    public static APlusPathfinder Instance => _instance;
+
+    private TileMapLayer tileMap;
+
+    // Für Debugging
+    private List<PathNode> lastClosedList = new List<PathNode>();
+
+    private Vector2I targetNode = Vector2I.One * -1;
+
+    public override void _Ready()
+    {
+        _instance = this;
+        tileMap = walls;
+        base._Ready();
+    }
+
+    public List<Vector2> Calculate(Vector2 start, Vector2 target)
+    {
+        Vector2I startNode = tileMap.LocalToMap(start);
+        targetNode = tileMap.LocalToMap(target);
+
+        // PriorityQueue für offene Knoten
+        PriorityQueue<Vector2I, int> openQueue = new PriorityQueue<Vector2I, int>();
+        HashSet<Vector2I> closedSet = new HashSet<Vector2I>();
+        Dictionary<Vector2I, int> gScore = new Dictionary<Vector2I, int>();
+        Dictionary<Vector2I, Vector2I?> cameFrom = new Dictionary<Vector2I, Vector2I?>();
+
+        openQueue.Enqueue(startNode, 0);
+        gScore[startNode] = 0;
+        cameFrom[startNode] = null;
+
+        // Debug: Liste der geschlossenen Knoten
+        lastClosedList.Clear();
+
+        while (openQueue.Count > 0)
+        {
+            Vector2I current = openQueue.Dequeue();
+            if (closedSet.Contains(current))
+                continue;
+            closedSet.Add(current);
+            lastClosedList.Add(new PathNode(current, gScore[current], cameFrom[current]));
+
+            if (current == targetNode)
+            {
+                // Pfad rekonstruieren
+                List<Vector2> path = new List<Vector2>();
+                Vector2I? step = current;
+                while (step != null)
+                {
+                    path.Insert(0, tileMap.MapToLocal(step.Value));
+                    step = cameFrom[step.Value];
+                }
+                // GD.Print("Path found");
+                return path;
+            }
+
+            List<Vector2I> neighbours = GetWalkableNeighboursSimple(current);
+            for (int i = 0; i < neighbours.Count; i++)
+            {
+                Vector2I neighbour = neighbours[i];
+                if (closedSet.Contains(neighbour))
+                    continue;
+
+                int tentativeG = gScore[current] + 1;
+                if (!gScore.ContainsKey(neighbour) || tentativeG < gScore[neighbour])
+                {
+                    cameFrom[neighbour] = current;
+                    gScore[neighbour] = tentativeG;
+                    int f = tentativeG + ManhattanDistance(neighbour, targetNode);
+                    openQueue.Enqueue(neighbour, f);
+                }
+            }
+        }
+        //GD.Print("Couldn't find Path");
+        return new List<Vector2>();
+    }
+
+    public struct DebugStruct
+    {
+        public List<Vector2> path;
+        public List<PathNode> closedList;
+    }
+
+    public DebugStruct DebugCalculate(Vector2 start, Vector2 target)
+    {
+        return new DebugStruct { path = Calculate(start, target), closedList = lastClosedList };
+    }
+
+    // Neue Nachbarsfunktion für Vector2I
+    private List<Vector2I> GetWalkableNeighboursSimple(Vector2I node)
+    {
+        List<Vector2I> neighbours = new List<Vector2I>();
+        for (int i = 0; i < WorldGenerator.neighbourDirections.Length; i++)
+        {
+            Vector2I direction = WorldGenerator.neighbourDirections[i];
+            Vector2I position = node + direction;
+            if (tileMap.GetCellSourceId(position) > 0)
+                continue; // Kein Tile vorhanden
+            TileData wallTileData = tileMap.GetCellTileData(position);
+            if (wallTileData != null)
+            {
+                if (WorldGenerator.CheckSpace(tileMap, position))
+                {
+                    neighbours.Add(position);
+                }
+            }
+        }
+        return neighbours;
+    }
+
+    // Alte Nachbarsfunktion entfernt, da nicht mehr benötigt
+
+    public int ManhattanDistance(Vector2I a, Vector2I b)
+    {
+        return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
+    }
+}
+
+public class PathNode
+{
+    public Vector2I position;
+    public int g;
+    public Vector2I? predecessor;
+
+    public PathNode(Vector2I position, int g, Vector2I? predecessor)
+    {
+        this.position = position;
+        this.g = g;
+        this.predecessor = predecessor;
+    }
+}

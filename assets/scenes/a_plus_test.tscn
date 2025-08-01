@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://h1l41w241gav"]
+
+[ext_resource type="Script" uid="uid://c4w71svhaacl7" path="res://assets/scripts/APlusTest.cs" id="1_dl8f7"]
+[ext_resource type="PackedScene" uid="uid://ccgetmgeg06d3" path="res://assets/scenes/room_patterns.tscn" id="2_dy8wf"]
+[ext_resource type="TileSet" uid="uid://cvo5b5vv8rj5r" path="res://assets/art/tile_set.tres" id="3_e8pc6"]
+[ext_resource type="Script" uid="uid://byax7akatc4qc" path="res://assets/scripts/character/APlusPathfinder.cs" id="4_dj7aj"]
+
+[node name="APlusTest" type="Node2D" node_paths=PackedStringArray("visulaiseLayer", "startMarker", "targetMarker")]
+script = ExtResource("1_dl8f7")
+visulaiseLayer = NodePath("room patterns/TileMapLayer")
+startMarker = NodePath("start")
+targetMarker = NodePath("target")
+
+[node name="room patterns" parent="." instance=ExtResource("2_dy8wf")]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="room patterns"]
+tile_set = ExtResource("3_e8pc6")
+
+[node name="start" type="Marker2D" parent="."]
+position = Vector2(211, 39)
+
+[node name="Polygon2D" type="Polygon2D" parent="start"]
+color = Color(0.1846, 0.71, 0.193357, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
+
+[node name="target" type="Marker2D" parent="."]
+position = Vector2(286, 105)
+
+[node name="Polygon2D" type="Polygon2D" parent="target"]
+color = Color(0.974745, 0.348205, 0.364613, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
+
+[node name="APlusPathfinder" type="Node2D" parent="." node_paths=PackedStringArray("ground", "walls")]
+script = ExtResource("4_dj7aj")
+ground = NodePath("../room patterns/ground")
+walls = NodePath("../room patterns/walls")
+
+[editable path="room patterns"]

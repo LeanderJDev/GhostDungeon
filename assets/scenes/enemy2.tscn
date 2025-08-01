@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4rk0wt3bsg2q"]
+
+[ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_vw1f8"]
+[ext_resource type="Script" uid="uid://tvu7j2bmjxar" path="res://assets/scripts/character/EnemyController.cs" id="2_ptiho"]
+[ext_resource type="PackedScene" uid="uid://c2vdvaj36c6so" path="res://assets/scenes/projectile.tscn" id="3_ptiho"]
+
+[node name="CharacterBody2D" instance=ExtResource("1_vw1f8")]
+collision_mask = 5
+script = ExtResource("2_ptiho")
+EnemyType = 1
+DetectionRange = 300.0
+ShootRange = 100.0
+ShootInterval = 1.0
+projectile = ExtResource("3_ptiho")
+moveSpeed = 80
+
+[node name="Sprite2D" parent="." index="1"]
+modulate = Color(0.6632, 0.307113, 0.678082, 1)
