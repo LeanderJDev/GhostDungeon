@@ -1,12 +1,12 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using Godot;
 
 public partial class Projectile : CharacterBody2D
 {
     private int speed = 200;
     private Vector2 direction;
-    private int maxBounce = 100;
+    public int maxBounce;
+    public bool hitGhosts;
 
     public override void _Ready()
     {
@@ -24,6 +24,8 @@ public partial class Projectile : CharacterBody2D
             Node2D body = (Node2D)collisionInfo.GetCollider();
             if (body is CharacterController characterController)
             {
+                if (!hitGhosts && characterController is GhostController)
+                    return;
                 characterController.Kill();
                 QueueFree();
             }
@@ -31,7 +33,7 @@ public partial class Projectile : CharacterBody2D
             {
                 direction = direction.Bounce(collisionInfo.GetNormal());
                 maxBounce--;
-                if (maxBounce == 0)
+                if (maxBounce <= 0)
                     QueueFree();
             }
         }

@@ -6,10 +6,11 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_sopgx"]
 radius = 7.0
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[node name="CharacterBody2D" type="CharacterBody2D" node_paths=PackedStringArray("itemDisplayContainer")]
 y_sort_enabled = true
 collision_layer = 4
 script = ExtResource("1_0ggam")
+itemDisplayContainer = NodePath("itemContainer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_sopgx")
@@ -22,3 +23,6 @@ texture = ExtResource("2_15r03")
 offset = Vector2(0, -12)
 hframes = 16
 frame = 1
+
+[node name="itemContainer" type="Node2D" parent="."]
+position = Vector2(0, -17)

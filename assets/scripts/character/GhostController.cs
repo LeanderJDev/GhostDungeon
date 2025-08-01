@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.Serialization;
 using Godot;
 
 public partial class GhostController : CharacterController
@@ -31,14 +30,16 @@ public partial class GhostController : CharacterController
             int actionIndex = pathIndex;
             foreach (var action in ghostPath.actions)
             {
-                if (
-                    action is CharacterAction characterAction
-                    && characterAction.index == actionIndex
-                )
+                if (action.index == actionIndex)
                 {
-                    if (action.action == 0)
+                    switch (action.action)
                     {
-                        Shoot(action.direction);
+                        case CharacterActionType.Shoot:
+                            Shoot(action.direction);
+                            break;
+                        case CharacterActionType.ItemPickup:
+                            CheckForChests();
+                            break;
                     }
                 }
             }

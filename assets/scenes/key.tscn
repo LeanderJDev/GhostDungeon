@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://7q2o0q261q4k"]
+
+[ext_resource type="Script" uid="uid://ppilgy0p1lf" path="res://assets/scripts/character/KeyItem.cs" id="1_eqs4p"]
+[ext_resource type="Texture2D" uid="uid://1fk05jfx0fb1" path="res://assets/art/tiles.png" id="2_frhpv"]
+
+[node name="Key" type="Node2D" node_paths=PackedStringArray("sprite")]
+y_sort_enabled = true
+script = ExtResource("1_eqs4p")
+sprite = NodePath("Sprite2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_frhpv")
+hframes = 2
+vframes = 2
+frame = 3
+region_enabled = true
+region_rect = Rect2(128, 64, 32, 32)

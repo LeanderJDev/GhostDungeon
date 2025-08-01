@@ -47,10 +47,31 @@ public partial class PlayerController : CharacterController
                 new CharacterAction
                 {
                     index = playerPath.positions.Count,
-                    action = 0,
+                    action = CharacterActionType.Shoot,
                     direction = shootDirection,
                 }
             );
+        }
+
+        if (Input.IsActionJustPressed("Interact"))
+        {
+            GD.Print("checkfor chests");
+            if (CheckForChests())
+            {
+                GD.Print("chest found");
+                playerPath.actions.Add(
+                    new CharacterAction
+                    {
+                        index = playerPath.positions.Count,
+                        action = CharacterActionType.ItemPickup,
+                        direction = Vector2.Zero,
+                    }
+                );
+            }
+            if (CheckAndUseDoors())
+            {
+                GD.Print("opened door");
+            }
         }
 
         if (Input.IsActionJustPressed("ui_accept"))
@@ -66,6 +87,9 @@ public partial class PlayerController : CharacterController
             ghostController.ghostPath = clonedPath;
             newGhost.Position = startPosition;
             GetTree().Root.AddChild(newGhost);
+
+            //testing hsdjkfakd
+            OpenChest(Random.Shared.Next());
         }
 
         base._Process(delta);

@@ -7,9 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://d4bpnqcmrp5wd" path="res://assets/scenes/player.tscn" id="4_ftlet"]
 [ext_resource type="Script" uid="uid://byax7akatc4qc" path="res://assets/scripts/character/APlusPathfinder.cs" id="5_j83db"]
 
-[node name="WorldGenerator" type="Node2D" node_paths=PackedStringArray("walls")]
+[node name="WorldGenerator" type="Node2D" node_paths=PackedStringArray("walls", "items")]
 script = ExtResource("1_4yd1a")
 walls = NodePath("room patterns/walls")
+items = NodePath("room patterns/items")
 roomCount = 20
 neighbourWeights = PackedInt32Array(1, 16, 64, 8, 4)
 enemies = Array[PackedScene]([ExtResource("2_5e37h"), ExtResource("3_j83db")])
@@ -21,7 +22,6 @@ rockCoords = Vector2i(11, 0)
 [node name="room patterns" parent="." instance=ExtResource("4_5e37h")]
 position = Vector2(-16000, -16000)
 
-[node name="APlusPathfinder" type="Node2D" parent="." node_paths=PackedStringArray("ground", "walls")]
+[node name="APlusPathfinder" type="Node2D" parent="." node_paths=PackedStringArray("walls")]
 script = ExtResource("5_j83db")
-ground = NodePath("../room patterns/ground")
 walls = NodePath("../room patterns/walls")

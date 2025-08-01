@@ -14,8 +14,13 @@ Löcher füllen
 
 public partial class WorldGenerator : Node2D
 {
+    public static WorldGenerator Instance { get; private set; }
+
     [Export]
     public TileMapLayer walls;
+
+    [Export]
+    public TileMapLayer items;
 
     [Export]
     public Vector2I roomSize = new Vector2I(12, 12);
@@ -73,6 +78,7 @@ public partial class WorldGenerator : Node2D
 
     public override void _Ready()
     {
+        Instance = this;
         base._Ready();
         if (walls == null)
         {
@@ -467,35 +473,34 @@ public partial class WorldGenerator : Node2D
     }
 
     // This will be called by the PlayerController to open a door
-    public bool OpenDoor(Vector2 worldPosition, int direction)
+    public bool OpenDoor(Vector2I tilePosition, int direction)  //1 == oben, rechts, 2 == unten, links
     {
-        Vector2I localPosition = walls.LocalToMap(walls.ToLocal(worldPosition));
-        int sourceId = walls.GetCellSourceId(localPosition);
+        int sourceId = walls.GetCellSourceId(tilePosition);
 
         if (sourceId == -1)
             return false; // No tile at this position
-        Vector2I atlasCoords = walls.GetCellAtlasCoords(localPosition);
+        Vector2I atlasCoords = walls.GetCellAtlasCoords(tilePosition);
         int horizontalDoorIndex = System.Array.IndexOf(horizontalDoorCoords, (Vector2)atlasCoords);
         int verticalDoorIndex = System.Array.IndexOf(verticalDoorCoords, (Vector2)atlasCoords);
 
         if (horizontalDoorIndex == 0)
         {
-            SetDoor(localPosition, Vector2I.Right, direction);
+            SetDoor(tilePosition, Vector2I.Right, direction);
             return true;
         }
         if (horizontalDoorIndex == 1)
         {
-            SetDoor(localPosition - Vector2I.Right, Vector2I.Right, direction);
+            SetDoor(tilePosition - Vector2I.Right, Vector2I.Right, direction);
             return true;
         }
         if (verticalDoorIndex == 0)
         {
-            SetDoor(localPosition, Vector2I.Down, direction);
+            SetDoor(tilePosition, Vector2I.Down, direction);
             return true;
         }
         if (verticalDoorIndex == 1)
         {
-            SetDoor(localPosition - Vector2I.Down, Vector2I.Down, direction);
+            SetDoor(tilePosition - Vector2I.Down, Vector2I.Down, direction);
             return true;
         }
         return false;

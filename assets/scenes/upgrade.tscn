@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://uvsthogq7so4"]
+
+[ext_resource type="Script" uid="uid://tiidfy8d376" path="res://assets/scripts/character/UpgradeItem.cs" id="1_igga6"]
+[ext_resource type="Texture2D" uid="uid://1fk05jfx0fb1" path="res://assets/art/tiles.png" id="2_l6dx6"]
+
+[node name="Upgrade" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_igga6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0.00784314, 0, 1)
+texture_filter = 1
+texture = ExtResource("2_l6dx6")
+hframes = 2
+vframes = 2
+frame = 3
+region_enabled = true
+region_rect = Rect2(128, 64, 32, 32)
