@@ -56,6 +56,9 @@ public partial class WorldGenerator : Node2D
     private List<Vector2I> generatedRooms = new();
     private Random random = new();
 
+    // Speichert das Spielerraum für Enemy-Spawn-Exklusion
+    private Vector2I? playerRoomSaved = null;
+
     public static readonly Vector2I[] neighbourDirections = new Vector2I[]
     {
         new Vector2I(0, -1), // North
@@ -258,7 +261,11 @@ public partial class WorldGenerator : Node2D
                     GD.PrintErr($"No walkable position found in room {roomA} or {roomB}");
                     continue;
                 }
-                List<Vector2> path = APlusPathfinder.Instance.Calculate(startA.Value, startB.Value);
+                List<Vector2> path = APlusPathfinder.Instance.Calculate(
+                    startA.Value,
+                    startB.Value,
+                    ignoreDoors: true
+                );
 
                 if (path != null && path.Count > maxDistance)
                 {
@@ -271,6 +278,8 @@ public partial class WorldGenerator : Node2D
                 }
             }
         }
+        // Speichere das Spielerraum für Enemy-Spawn-Exklusion
+        playerRoomSaved = playerRoom;
         if (maxDistance < 1)
         {
             GD.PrintErr("No valid path between any two rooms.");
@@ -389,6 +398,9 @@ public partial class WorldGenerator : Node2D
         }
         foreach (Vector2I room in generatedRooms)
         {
+            // Spielerraum überspringen
+            if (playerRoomSaved != null && room == playerRoomSaved.Value)
+                continue;
             int enemyCount = random.Next(4);
             int maxEnemyTries = roomCount * 6;
             int tries = 0;
@@ -473,7 +485,7 @@ public partial class WorldGenerator : Node2D
     }
 
     // This will be called by the PlayerController to open a door
-    public bool OpenDoor(Vector2I tilePosition, int direction)  //1 == oben, rechts, 2 == unten, links
+    public bool OpenDoor(Vector2I tilePosition, int direction) //1 == oben, rechts, 2 == unten, links
     {
         int sourceId = walls.GetCellSourceId(tilePosition);
 

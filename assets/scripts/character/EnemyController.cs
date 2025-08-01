@@ -123,7 +123,6 @@ public partial class EnemyController : CharacterController
             {
                 moveDirection = Vector2.Zero;
                 currentPath.Clear();
-                TryStepAwayFromWall();
                 return true;
             }
             targetPosition = currentPath[pathIndex];
@@ -147,7 +146,6 @@ public partial class EnemyController : CharacterController
     {
         currentPath.Clear();
         moveDirection = Vector2.Zero;
-        TryStepAwayFromWall();
     }
 
     // ...entfernt, neue Version weiter unten...
@@ -163,8 +161,8 @@ public partial class EnemyController : CharacterController
     // ...entfernt, neue Version weiter unten...
     private bool HasLineOfSightToPlayer()
     {
-        var space = GetWorld2D().DirectSpaceState;
-        var playerPos = player.GlobalPosition;
+        PhysicsDirectSpaceState2D space = GetWorld2D().DirectSpaceState;
+        Vector2 playerPos = player.GlobalPosition;
         float radius = 4f;
         Vector2[] offsets = new Vector2[]
         {
@@ -174,7 +172,7 @@ public partial class EnemyController : CharacterController
             new Vector2(0, -radius),
             new Vector2(0, radius),
         };
-        foreach (var offset in offsets)
+        foreach (Vector2 offset in offsets)
         {
             Vector2 target = playerPos + offset;
             if (RayHitsPlayer(target, space))
@@ -185,13 +183,16 @@ public partial class EnemyController : CharacterController
 
     private bool RayHitsPlayer(Vector2 target, PhysicsDirectSpaceState2D space)
     {
-        var query = PhysicsRayQueryParameters2D.Create(GlobalPosition, target);
+        PhysicsRayQueryParameters2D query = PhysicsRayQueryParameters2D.Create(
+            GlobalPosition,
+            target
+        );
         query.CollisionMask = (1 << 1) | (1 << 2);
         query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
-        var result = space.IntersectRay(query);
+        Godot.Collections.Dictionary result = space.IntersectRay(query);
         if (result.Count == 0)
             return false;
-        if (result.TryGetValue("collider", out var collider))
+        if (result.TryGetValue("collider", out Variant collider))
         {
             Node colliderNode = ((Godot.Variant)collider).As<Node>();
             if (colliderNode != null && colliderNode.GetInstanceId() == player.GetInstanceId())
@@ -229,7 +230,6 @@ public partial class EnemyController : CharacterController
             wanderPath = null;
             moveDirection = Vector2.Zero;
             wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
-            TryStepAwayFromWall();
             return;
         }
 
@@ -245,7 +245,6 @@ public partial class EnemyController : CharacterController
                     wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
                     wanderPath = null;
                     moveDirection = Vector2.Zero;
-                    TryStepAwayFromWall();
                     return;
                 }
                 target = wanderPath[wanderPathIndex];
@@ -257,7 +256,6 @@ public partial class EnemyController : CharacterController
         {
             wanderPath = null;
             moveDirection = Vector2.Zero;
-            TryStepAwayFromWall();
         }
     }
 
@@ -267,7 +265,6 @@ public partial class EnemyController : CharacterController
         {
             wanderTimer -= (float)delta;
             moveDirection = Vector2.Zero;
-            TryStepAwayFromWall();
             return true;
         }
         return false;
@@ -288,7 +285,10 @@ public partial class EnemyController : CharacterController
 
             if (!APlusPathfinder.Instance.IsTileWalkable(candidateTarget))
                 continue;
-            var candidatePath = APlusPathfinder.Instance.Calculate(Position, candidateTarget);
+            List<Vector2> candidatePath = APlusPathfinder.Instance.Calculate(
+                Position,
+                candidateTarget
+            );
             if (candidatePath != null && candidatePath.Count > 1)
             {
                 int cropLen = Math.Min(maxWanderDistance, candidatePath.Count);
@@ -301,26 +301,6 @@ public partial class EnemyController : CharacterController
         wanderPath = null;
         wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
         moveDirection = Vector2.Zero;
-        TryStepAwayFromWall();
-    }
-
-    // Versucht, den Gegner von angrenzenden Wänden wegzubewegen, damit er frei schießen kann
-    // Entfernt, da optimierte Version weiter unten
-    private void TryStepAwayFromWall()
-    {
-        foreach (var dir in WorldGenerator.eightNeighbourDirections)
-        {
-            Vector2 checkPos = Position + dir * 16;
-            if (!APlusPathfinder.Instance.IsTileWalkable(checkPos))
-            {
-                Vector2 awayPos = Position - dir * 16;
-                if (APlusPathfinder.Instance.IsTileWalkable(awayPos))
-                {
-                    moveDirection = (awayPos - Position).Normalized();
-                    return;
-                }
-            }
-        }
     }
 
     private void EnsurePlayerReference()

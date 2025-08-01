@@ -11,4 +11,4 @@ ShootInterval = 1.0
 moveSpeed = 80
 
 [node name="Sprite2D" parent="." index="1"]
-modulate = Color(0.6632, 0.307113, 0.678082, 1)
+modulate = Color(0.32711, 0.33614, 0.577174, 1)

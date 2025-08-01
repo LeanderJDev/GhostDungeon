@@ -13,6 +13,7 @@ immortal = false
 [node name="PointLight2D" type="PointLight2D" parent="." index="1"]
 show_behind_parent = true
 position = Vector2(0, -4)
+energy = 1.5
 shadow_enabled = true
 shadow_color = Color(0, 0, 0, 1)
 texture = ExtResource("4_4wcc8")

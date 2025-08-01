@@ -30,7 +30,7 @@ public partial class APlusPathfinder : Node2D
         base._Ready();
     }
 
-    public List<Vector2> Calculate(Vector2 start, Vector2 target)
+    public List<Vector2> Calculate(Vector2 start, Vector2 target, bool ignoreDoors = false)
     {
         Vector2I startNode = tileMap.LocalToMap(start);
         targetNode = tileMap.LocalToMap(target);
@@ -70,7 +70,7 @@ public partial class APlusPathfinder : Node2D
                 return path;
             }
 
-            List<Vector2I> neighbours = GetWalkableNeighboursSimple(current);
+            List<Vector2I> neighbours = GetWalkableNeighboursSimple(current, ignoreDoors);
             for (int i = 0; i < neighbours.Count; i++)
             {
                 Vector2I neighbour = neighbours[i];
@@ -99,43 +99,35 @@ public partial class APlusPathfinder : Node2D
 
     public DebugStruct DebugCalculate(Vector2 start, Vector2 target)
     {
-        return new DebugStruct { path = Calculate(start, target), closedList = lastClosedList };
+        return new DebugStruct
+        {
+            path = Calculate(start, target, ignoreDoors: true),
+            closedList = lastClosedList,
+        };
     }
 
-    public bool IsTileWalkable(Vector2 position)
+    public bool IsTileWalkable(Vector2 position, bool ignoreDoors = false)
     {
         Vector2I node = tileMap.LocalToMap(position);
         if (tileMap.GetCellSourceId(node) == -1)
             return false; // Kein Tile vorhanden
-        if (tileMap.GetCellSourceId(node) > 0)
-            return true; // Türen immer als begehbar betrachten
-        TileData wallTileData = tileMap.GetCellTileData(node);
-        if (wallTileData != null)
-        {
-            return WorldGenerator.CheckSpace(tileMap, node);
-        }
-        return false;
+        if (tileMap.GetCellSourceId(node) > 0 && ignoreDoors)
+            return true;
+
+        return WorldGenerator.CheckSpace(tileMap, node);
     }
 
     // Neue Nachbarsfunktion für Vector2I
-    private List<Vector2I> GetWalkableNeighboursSimple(Vector2I node)
+    private List<Vector2I> GetWalkableNeighboursSimple(Vector2I node, bool ignoreDoors = false)
     {
         List<Vector2I> neighbours = new List<Vector2I>();
         for (int i = 0; i < WorldGenerator.neighbourDirections.Length; i++)
         {
             Vector2I direction = WorldGenerator.neighbourDirections[i];
             Vector2I position = node + direction;
-            if (tileMap.GetCellSourceId(position) == -1)
-                continue; // Kein Tile vorhanden
-            if (tileMap.GetCellSourceId(position) > 0)
-                neighbours.Add(position); // Türen immer als begehbar betrachten
-            TileData wallTileData = tileMap.GetCellTileData(position);
-            if (wallTileData != null)
+            if (IsTileWalkable(tileMap.MapToLocal(position), ignoreDoors))
             {
-                if (WorldGenerator.CheckSpace(tileMap, position))
-                {
-                    neighbours.Add(position);
-                }
+                neighbours.Add(position);
             }
         }
         return neighbours;
