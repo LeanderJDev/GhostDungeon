@@ -28,9 +28,9 @@ public partial class KeyItem : Item
 
 public enum KeyColor
 {
-    White = -1,
-    Green = 1,
-    Violet = 0,
+    White = 0,
+    Green = 2,
+    Violet = 4,
     Turquoise = 3,
-    Red = 2,
+    Red = 1,
 }

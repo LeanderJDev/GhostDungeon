@@ -14,6 +14,9 @@ public partial class PlayerController : CharacterController
     [Export]
     public PackedScene ghost;
 
+    [Export]
+    public bool immortal;
+
     public CharacterPath playerPath = new CharacterPath
     {
         positions = new List<Vector2>(),

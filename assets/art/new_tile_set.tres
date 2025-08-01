@@ -791,12 +791,10 @@ texture = ExtResource("1_7oh2i")
 8:6/0/terrains_peering_bit/top_left_corner = 1
 8:6/0/terrains_peering_bit/top_side = 1
 8:6/0/terrains_peering_bit/top_right_corner = 0
-8:6/0/custom_data_1 = "chest"
 9:4/0 = 0
 9:5/0 = 0
 9:6/size_in_atlas = Vector2i(1, 2)
 9:6/0 = 0
-9:6/0/custom_data_1 = "openchest"
 2:0/0 = 0
 2:0/0/y_sort_origin = -8
 10:4/0 = 0
@@ -911,8 +909,10 @@ texture = ExtResource("1_7oh2i")
 7:6/0/terrains_peering_bit/top_side = 1
 7:6/0/terrains_peering_bit/top_right_corner = 1
 14:6/0 = 0
+14:6/0/custom_data_1 = "chest"
 15:6/size_in_atlas = Vector2i(1, 2)
 15:6/0 = 0
+15:6/0/custom_data_1 = "openchest"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_a26vm"]
 texture = ExtResource("2_3jwfw")

@@ -53,9 +53,9 @@ public partial class CharacterController : CharacterBody2D
 
     protected bool CheckForChests()
     {
-        Vector2I openchestAtlasPos = new(9, 6);
+        Vector2I openchestAtlasPos = new(15, 6);
         
-        TileMapLayer tilemap = WorldGenerator.Instance.items;
+        TileMapLayer tilemap = WorldGenerator.Instance.walls;
 
         Vector2I tilePos = tilemap.LocalToMap(tilemap.ToLocal(Position));
         foreach (Vector2I pos in tilemap.GetSurroundingCells(tilePos))
@@ -114,17 +114,18 @@ public partial class CharacterController : CharacterBody2D
             {
                 GD.Print("door found");
                 int color = tilemap.GetCellSourceId(pos);
+                GD.Print("color:");
+                GD.Print(color);
                 KeyItem matchingKey = collectedKeys.FirstOrDefault(x => (int)x.Color == color);
                 if (matchingKey != null)
                 {
+                    GD.Print("door opened");
                     collectedKeys.Remove(matchingKey);
                     ReleaseItemToDisplay(matchingKey);
                     matchingKey.QueueFree();
                     bool isDoorVertical = tilemap.GetCellAtlasCoords(pos) == new Vector2I(0, 5);
                     Vector2 dst = tilemap.MapToLocal(pos) - tilemap.ToLocal(Position);
-                    GD.Print(dst.Sign());
                     bool isDistanceNegative = isDoorVertical ? dst.X > 0 : dst.Y < 0;
-                    GD.Print(isDistanceNegative);
                     WorldGenerator.Instance.OpenDoor(pos, isDistanceNegative ? 1 : 2);
                     return true;
                 }
@@ -144,9 +145,13 @@ public partial class CharacterController : CharacterBody2D
 
     public void Kill()
     {
-        if (this is PlayerController)
+        if (this is PlayerController player)
         {
             GD.Print("Dead");
+            if (player.immortal != true)
+            {
+                YourRunRestartsHere.Instance.PlayerDead();
+            }
         }
         else
         {
