@@ -16,8 +16,6 @@ public partial class APlusPathfinder : Node2D
     private static APlusPathfinder _instance;
     public static APlusPathfinder Instance => _instance;
 
-    private TileMapLayer tileMap;
-
     // Für Debugging
     private List<PathNode> lastClosedList = new List<PathNode>();
 
@@ -26,14 +24,13 @@ public partial class APlusPathfinder : Node2D
     public override void _Ready()
     {
         _instance = this;
-        tileMap = walls;
         base._Ready();
     }
 
     public List<Vector2> Calculate(Vector2 start, Vector2 target, bool ignoreDoors = false)
     {
-        Vector2I startNode = tileMap.LocalToMap(start);
-        targetNode = tileMap.LocalToMap(target);
+        Vector2I startNode = walls.LocalToMap(start);
+        targetNode = walls.LocalToMap(target);
 
         // PriorityQueue für offene Knoten
         PriorityQueue<Vector2I, int> openQueue = new PriorityQueue<Vector2I, int>();
@@ -63,7 +60,7 @@ public partial class APlusPathfinder : Node2D
                 Vector2I? step = current;
                 while (step != null)
                 {
-                    path.Insert(0, tileMap.ToGlobal(tileMap.MapToLocal(step.Value)));
+                    path.Insert(0, walls.ToGlobal(walls.MapToLocal(step.Value)));
                     step = cameFrom[step.Value];
                 }
                 // GD.Print("Path found");
@@ -108,13 +105,15 @@ public partial class APlusPathfinder : Node2D
 
     public bool IsTileWalkable(Vector2 position, bool ignoreDoors = false)
     {
-        Vector2I node = tileMap.LocalToMap(position);
-        if (tileMap.GetCellSourceId(node) == -1)
-            return false; // Kein Tile vorhanden
-        if (tileMap.GetCellSourceId(node) > 0 && ignoreDoors)
+        Vector2I node = walls.LocalToMap(position);
+        if (ground.GetCellSourceId(node) == -1)
+            return false; // Kein Boden vorhanden
+        if (walls.GetCellSourceId(node) > 0 && ignoreDoors)
             return true;
+        if (walls.GetCellSourceId(node) != -1)
+            return false; // Wand vorhanden
 
-        return WorldGenerator.CheckSpace(tileMap, node);
+        return WorldGenerator.CheckSpace(walls, ground, node);
     }
 
     // Neue Nachbarsfunktion für Vector2I
@@ -125,7 +124,7 @@ public partial class APlusPathfinder : Node2D
         {
             Vector2I direction = WorldGenerator.neighbourDirections[i];
             Vector2I position = node + direction;
-            if (IsTileWalkable(tileMap.MapToLocal(position), ignoreDoors))
+            if (IsTileWalkable(walls.MapToLocal(position), ignoreDoors))
             {
                 neighbours.Add(position);
             }

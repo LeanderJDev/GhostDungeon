@@ -33,7 +33,7 @@ public partial class WorldGenerator : Node2D
     public TileMapLayer walls;
 
     [Export]
-    public TileMapLayer items;
+    public TileMapLayer ground;
 
     [Export]
     public Vector2I roomSize = new Vector2I(12, 12);
@@ -65,11 +65,10 @@ public partial class WorldGenerator : Node2D
     public static int Seed;
 
     private TileSet tileSet;
-    private TileMapPattern groundSquarePattern;
     private TileMapPattern[] roomChoices;
     private Queue<Vector2I> generationQueue = new();
     private List<Vector2I> generatedRooms = new();
-    private Random random = new(Seed);
+    private Random random = new();
 
     // Speichert das Spielerraum für Enemy-Spawn-Exklusion
     private Vector2I? playerRoomSaved = null;
@@ -108,9 +107,9 @@ public partial class WorldGenerator : Node2D
     public override void _Ready()
     {
         base._Ready();
-        if (walls == null)
+        if (walls == null || ground == null)
         {
-            GD.PrintErr("TileMapLayer 'walls' is not set.");
+            GD.PrintErr("TileMapLayer 'walls' or 'ground' is not set.");
             return;
         }
         tileSet = walls.TileSet;
@@ -119,22 +118,18 @@ public partial class WorldGenerator : Node2D
             GD.PrintErr("TileSet is not set in TileMapLayer 'walls'.");
             return;
         }
-        groundSquarePattern = tileSet.GetPattern(0);
-
-        int roomChoiceCount = tileSet.GetPatternsCount() - 1;
-        roomChoices = Enumerable
-            .Range(1, roomChoiceCount)
-            .Select(i => tileSet.GetPattern(i))
-            .ToArray();
+        int roomChoiceCount = tileSet.GetPatternsCount();
+        roomChoices = new TileMapPattern[roomChoiceCount];
+        for (int i = 0; i < roomChoiceCount; i++)
+            roomChoices[i] = tileSet.GetPattern(i);
         if (roomChoices.Length == 0)
         {
             GD.PrintErr("No room patterns found in TileSet.");
             return;
         }
-
+        random = Seed != 0 ? new Random(Seed) : new Random();
         GD.Print($"Found {roomChoices.Length} room patterns in TileSet.");
         GD.Print("Starting world generation...");
-
         StartGeneration();
     }
 
@@ -152,6 +147,7 @@ public partial class WorldGenerator : Node2D
         var sw = System.Diagnostics.Stopwatch.StartNew();
         GD.Print("Generating Rooms at: ", position);
         walls.Clear();
+        ground.Clear();
         generatedRoomCount = 0;
 
         GD.Print("Target: ", roomCount);
@@ -255,18 +251,23 @@ public partial class WorldGenerator : Node2D
         // Hilfsfunktion: finde begehbare Position im Raum
         Vector2? FindWalkableInRoom(Vector2I room)
         {
+            List<Vector2I> possiblePositions = new();
             for (int x = 1; x < roomSize.X - 1; x++)
+            for (int y = 1; y < roomSize.Y - 1; y++)
+                possiblePositions.Add(room + new Vector2I(x, y));
+            // Fisher-Yates Shuffle für Effizienz
+            for (int i = possiblePositions.Count - 1; i > 0; i--)
             {
-                for (int y = 1; y < roomSize.Y - 1; y++)
-                {
-                    Vector2I pos = room + new Vector2I(x, y);
-                    if (CheckSpace(walls, pos))
-                    {
-                        var tileData = walls.GetCellTileData(pos);
-                        if (tileData != null && tileData.TerrainSet == 0 && tileData.Terrain == 1)
-                            return (Vector2)walls.MapToLocal(pos);
-                    }
-                }
+                int j = random.Next(i + 1);
+                (possiblePositions[i], possiblePositions[j]) = (
+                    possiblePositions[j],
+                    possiblePositions[i]
+                );
+            }
+            foreach (var pos in possiblePositions)
+            {
+                if (CheckSpace(walls, ground, pos))
+                    return (Vector2)walls.MapToLocal(pos);
             }
             return null;
         }
@@ -284,7 +285,7 @@ public partial class WorldGenerator : Node2D
                 if (startA == null || startB == null)
                 {
                     GD.PrintErr($"No walkable position found in room {roomA} or {roomB}");
-                    continue;
+                    break;
                 }
                 List<Vector2> path = APlusPathfinder.Instance.Calculate(
                     startA.Value,
@@ -350,17 +351,17 @@ public partial class WorldGenerator : Node2D
         int doorEndY = doorStartY + 1 * direction.Y % 2;
 
         // Close the door by setting wall tiles in the door area
-        for (int x = doorStartX; x <= doorEndX; x++)
-        {
-            for (int y = doorStartY; y <= doorEndY; y++)
-            {
-                walls.SetCell(
-                    new Vector2I(x, y),
-                    walls.GetCellSourceId(roomPosition),
-                    walls.GetCellAtlasCoords(roomPosition)
-                );
-            }
-        }
+        TileData wallTileData = walls.GetCellTileData(roomPosition);
+        walls.SetCellsTerrainConnect(
+            [
+                new Vector2I(doorStartX, doorStartY),
+                new Vector2I(doorStartX, doorEndY),
+                new Vector2I(doorEndX, doorStartY),
+                new Vector2I(doorEndX, doorEndY),
+            ],
+            wallTileData.TerrainSet,
+            wallTileData.Terrain
+        );
     }
 
     private void FillGaps()
@@ -371,12 +372,14 @@ public partial class WorldGenerator : Node2D
             foreach (Vector2I dir in eightNeighbourDirections)
             {
                 Vector2I neighbourPos = room + dir * (roomSize - Vector2I.One);
+                if (generatedRooms.Contains(neighbourPos))
+                    continue; // Skip if neighbour is a room
                 for (int x = neighbourPos.X; x < neighbourPos.X + roomSize.X; x++)
                 {
                     for (int y = neighbourPos.Y; y < neighbourPos.Y + roomSize.Y; y++)
                     {
                         Vector2I pos = new Vector2I(x, y);
-                        if (walls.GetCellSourceId(pos) == -1)
+                        if (walls.GetCellSourceId(pos) == -1 && ground.GetCellSourceId(pos) == -1)
                             walls.SetCell(pos, 0, rockCoords);
                     }
                 }
@@ -411,102 +414,6 @@ public partial class WorldGenerator : Node2D
             new Vector2I(doorStartX, doorStartY),
             new Vector2I(direction.X % 2, direction.Y % 2)
         );
-    }
-
-    private void SpawnEnemies()
-    {
-        GD.Print("Spawning Enemies");
-        if (enemies == null || enemies.Length == 0)
-        {
-            GD.Print("No enemies to spawn");
-            return;
-        }
-        foreach (Vector2I room in generatedRooms)
-        {
-            // Spielerraum überspringen
-            if (playerRoomSaved != null && room == playerRoomSaved.Value)
-                continue;
-            int enemyCount = random.Next(4);
-            int maxEnemyTries = roomCount * 6;
-            int tries = 0;
-            while (enemyCount > 0 && tries < maxEnemyTries)
-            {
-                int x = random.Next(1, roomSize.X - 1);
-                int y = random.Next(1, roomSize.Y - 1);
-                Vector2I localPos = new Vector2I(x, y);
-                Vector2I worldPos = room + localPos;
-                if (!CheckSpace(walls, worldPos))
-                {
-                    tries++;
-                    continue;
-                }
-                if (enemies.Length > 0)
-                {
-                    var enemyScene = enemies[random.Next(enemies.Length)];
-                    var enemy = enemyScene.Instantiate<Node2D>();
-                    enemy.Position = worldPos * walls.TileSet.TileSize + Position;
-                    GetParent().CallDeferred("add_child", enemy);
-                    enemyCount--;
-                }
-                tries++;
-            }
-            if (tries >= maxEnemyTries && enemyCount > 0)
-            {
-                GD.PrintErr(
-                    $"SpawnEnemies: Aborted after {maxEnemyTries} tries in room {room}, {enemyCount} enemies not spawned."
-                );
-            }
-        }
-    }
-
-    public static bool CheckSpace(TileMapLayer tileMap, Vector2I position)
-    {
-        TileData wallTileData = tileMap.GetCellTileData(position);
-        if (wallTileData != null)
-        {
-            if (wallTileData.GetCollisionPolygonsCount(0) != 0)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Neue Struktur für Terrain-Batching
-    private Dictionary<(int terrainSet, int terrain), HashSet<Vector2I>> terrainUpdateBatches =
-        new();
-
-    // Prüft, ob ein Tile eine Tür ist (anhand der DoorCoords)
-    private bool IsDoorTile(Vector2I position)
-    {
-        int sourceId = walls.GetCellSourceId(position);
-        if (sourceId != 1)
-            return false;
-        Vector2I atlas = walls.GetCellAtlasCoords(position);
-        foreach (var v in horizontalDoorCoords)
-            if ((Vector2)v == (Vector2)atlas)
-                return true;
-        foreach (var v in verticalDoorCoords)
-            if ((Vector2)v == (Vector2)atlas)
-                return true;
-        return false;
-    }
-
-    // Fügt ein Tile der Batch-Liste hinzu, ruft aber nicht direkt SetCellsTerrainConnect
-    private void BatchTileForTerrain(Vector2I position)
-    {
-        var wallTileData = walls.GetCellTileData(position);
-        if (wallTileData == null)
-            return;
-        if (wallTileData.TerrainSet == -1 || wallTileData.Terrain == -1)
-            return;
-        var key = (wallTileData.TerrainSet, wallTileData.Terrain);
-        if (!terrainUpdateBatches.TryGetValue(key, out var set))
-        {
-            set = new HashSet<Vector2I>();
-            terrainUpdateBatches[key] = set;
-        }
-        set.Add(position);
     }
 
     // This will be called by the PlayerController to open a door
@@ -561,27 +468,161 @@ public partial class WorldGenerator : Node2D
             doorColor,
             (Vector2I)doorCoords[open * 2 + 1]
         );
-        // Statt direktem Update: Tiles im Umfeld batchen (ohne Türtiles, keine Duplikate)
-        for (int x = position.X - 1; x <= position.X + direction.X + 1; x++)
+    }
+
+    private void SpawnEnemies()
+    {
+        GD.Print("Spawning Enemies");
+        if (enemies == null || enemies.Length == 0)
         {
-            for (int y = position.Y - 1; y <= position.Y + direction.Y + 1; y++)
+            GD.Print("No enemies to spawn");
+            return;
+        }
+        foreach (Vector2I room in generatedRooms)
+        {
+            // Spielerraum überspringen
+            if (playerRoomSaved != null && room == playerRoomSaved.Value)
+                continue;
+            int enemyCount = random.Next(4);
+            int maxEnemyTries = roomCount * 6;
+            int tries = 0;
+            while (enemyCount > 0 && tries < maxEnemyTries)
             {
-                Vector2I pos = new Vector2I(x, y);
-                if (!IsDoorTile(pos))
-                    BatchTileForTerrain(pos);
+                int x = random.Next(1, roomSize.X - 1);
+                int y = random.Next(1, roomSize.Y - 1);
+                Vector2I localPos = new Vector2I(x, y);
+                Vector2I worldPos = room + localPos;
+                if (!CheckSpace(walls, ground, worldPos))
+                {
+                    tries++;
+                    continue;
+                }
+                if (enemies.Length > 0)
+                {
+                    var enemyScene = enemies[random.Next(enemies.Length)];
+                    var enemy = enemyScene.Instantiate<Node2D>();
+                    enemy.Position = worldPos * walls.TileSet.TileSize + Position;
+                    GetParent().CallDeferred("add_child", enemy);
+                    enemyCount--;
+                }
+                tries++;
+            }
+            if (tries >= maxEnemyTries && enemyCount > 0)
+            {
+                GD.PrintErr(
+                    $"SpawnEnemies: Aborted after {maxEnemyTries} tries in room {room}, {enemyCount} enemies not spawned."
+                );
             }
         }
     }
 
+    public static bool CheckSpace(
+        TileMapLayer wallTileMap,
+        TileMapLayer groundTileMap,
+        Vector2I position
+    )
+    {
+        if (wallTileMap.GetCellSourceId(position) != -1)
+            return false;
+        if (groundTileMap.GetCellSourceId(position) == -1)
+            return false;
+        TileData groundTileData = groundTileMap.GetCellTileData(position);
+        if (groundTileData != null && groundTileData.GetCollisionPolygonsCount(0) != 0)
+            return false;
+        return true;
+    }
+
+    // Neue Struktur für Terrain-Batching
+    private Dictionary<(int terrainSet, int terrain), HashSet<Vector2I>> wallsUpdateBatches = new();
+    private Dictionary<(int terrainSet, int terrain), HashSet<Vector2I>> groundUpdateBatches =
+        new();
+
+    // Prüft, ob ein Tile eine Tür ist (anhand der DoorCoords)
+    private bool IsDoorTile(Vector2I position)
+    {
+        int sourceId = walls.GetCellSourceId(position);
+        if (sourceId == 0)
+            return false;
+        return true;
+    }
+
+    private void UpdateTiles()
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        GD.Print("Batching Tiles by Terrain...");
+        wallsUpdateBatches.Clear();
+        groundUpdateBatches.Clear();
+        int skipped = 0;
+        // walls
+        foreach (var cell in walls.GetUsedCells())
+        {
+            if (IsDoorTile(cell))
+            {
+                skipped++;
+                continue;
+            }
+            BatchTileForTerrain(cell, walls);
+        }
+        // ground
+        foreach (var cell in ground.GetUsedCells())
+        {
+            BatchTileForTerrain(cell, ground);
+        }
+        GD.Print($"Skipped {skipped} door tiles");
+        int batchCount = 0;
+        foreach (var kv in wallsUpdateBatches)
+        {
+            var cells = kv.Value;
+            if (cells.Count == 0)
+                continue;
+            walls.SetCellsTerrainConnect([.. cells], kv.Key.terrainSet, kv.Key.terrain);
+            batchCount++;
+        }
+        foreach (var kv in groundUpdateBatches)
+        {
+            var cells = kv.Value;
+            if (cells.Count == 0)
+                continue;
+            ground.SetCellsTerrainConnect([.. cells], kv.Key.terrainSet, kv.Key.terrain);
+            batchCount++;
+        }
+
+        sw.Stop();
+        GD.Print(
+            $"[Time] UpdateTiles (batched): {sw.ElapsedMilliseconds} ms, {batchCount} batches"
+        );
+    }
+
+    // Fügt ein Tile der Batch-Liste hinzu, ruft aber nicht direkt SetCellsTerrainConnect
+    private void BatchTileForTerrain(Vector2I position, TileMapLayer tilemap)
+    {
+        var tileData = tilemap.GetCellTileData(position);
+        if (tileData == null)
+            return;
+        if (tileData.TerrainSet == -1 || tileData.Terrain == -1)
+            return;
+        var key = (tileData.TerrainSet, tileData.Terrain);
+        Dictionary<(int, int), HashSet<Vector2I>> batchDict =
+            tilemap == walls ? wallsUpdateBatches : groundUpdateBatches;
+        if (!batchDict.TryGetValue(key, out var set))
+        {
+            set = new HashSet<Vector2I>();
+            batchDict[key] = set;
+        }
+        set.Add(position);
+    }
+
     private bool GenerateRoom(Vector2I position)
     {
-        if (walls.GetCellSourceId(position + Vector2I.One) != -1)
+        if (ground.GetCellSourceId(position + Vector2I.One) != -1)
             return false;
-        int index = random.Next(roomChoices.Length);
-        TileMapPattern roomChoice = roomChoices[index];
+        int index = random.Next(roomChoices.Length / 2) * 2;
+        TileMapPattern wallChoice = roomChoices[index];
+        TileMapPattern groundChoice = roomChoices[index + 1];
         int rotation = random.Next(4);
-        TileMapPattern rotatedRoom = RotatePattern(roomChoice, rotation);
-        DrawRoom(position, rotatedRoom);
+        TileMapPattern rotatedWallRoom = RotatePattern(wallChoice, rotation);
+        TileMapPattern rotatedGroundRoom = RotatePattern(groundChoice, rotation);
+        DrawRoom(position, rotatedWallRoom, rotatedGroundRoom);
 
         int neighbourCount = 0;
         int totalWeight = neighbourWeights.Sum();
@@ -607,24 +648,14 @@ public partial class WorldGenerator : Node2D
         return true;
     }
 
-    private void DrawRoom(Vector2I position, TileMapPattern pattern)
+    private void DrawRoom(
+        Vector2I position,
+        TileMapPattern wallPattern,
+        TileMapPattern groundPattern
+    )
     {
-        foreach (Vector2I cell in pattern.GetUsedCells())
-        {
-            Vector2I worldPos = position + cell;
-            int sourceId = pattern.GetCellSourceId(cell);
-            Vector2I atlasCoords = pattern.GetCellAtlasCoords(cell);
-            if (sourceId == -1)
-                GD.Print(position);
-            if (!IsValidTile(sourceId, atlasCoords))
-            {
-                GD.PrintErr(
-                    $"Tile not found at {worldPos} (sourceId: {sourceId}, atlasCoords: {atlasCoords})"
-                );
-                continue;
-            }
-            walls.SetCell(worldPos, sourceId, atlasCoords);
-        }
+        walls.SetPattern(position, wallPattern);
+        ground.SetPattern(position, groundPattern);
     }
 
     private bool IsValidTile(int sourceId, Vector2I atlasCoords)
@@ -637,42 +668,11 @@ public partial class WorldGenerator : Node2D
         return source.HasTile(atlasCoords);
     }
 
-    private void UpdateTiles()
-    {
-        var sw = System.Diagnostics.Stopwatch.StartNew();
-        GD.Print("Batching Tiles by Terrain...");
-        terrainUpdateBatches.Clear();
-        var usedCells = walls.GetUsedCells();
-        int skipped = 0;
-        foreach (Vector2I cell in usedCells)
-        {
-            if (IsDoorTile(cell))
-            {
-                skipped++;
-                continue;
-            }
-            BatchTileForTerrain(cell);
-        }
-        GD.Print($"Skipped {skipped} door tiles");
-        int batchCount = 0;
-        foreach (var kv in terrainUpdateBatches)
-        {
-            var cells = kv.Value;
-            if (cells.Count == 0)
-                continue;
-            walls.SetCellsTerrainConnect([.. cells], kv.Key.terrainSet, kv.Key.terrain);
-            batchCount++;
-        }
-        sw.Stop();
-        GD.Print(
-            $"[Time] UpdateTiles (batched): {sw.ElapsedMilliseconds} ms, {batchCount} batches"
-        );
-    }
-
     // UpdateTile wird nicht mehr direkt genutzt, stattdessen BatchTileForTerrain
     private void UpdateTile(Vector2I position)
     {
-        BatchTileForTerrain(position);
+        BatchTileForTerrain(position, walls);
+        BatchTileForTerrain(position, ground);
     }
 
     // Danke GitHub Copilot (:

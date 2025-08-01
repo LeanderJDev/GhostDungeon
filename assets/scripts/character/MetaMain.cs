@@ -19,7 +19,7 @@ public partial class MetaMain : Node2D
     public override void _Ready()
     {
         base._Ready();
-        WorldGenerator.Seed = Random.Shared.Next();
+        WorldGenerator.Seed = Time.GetDateStringFromSystem().GetHashCode();
         Instance.AddChild(Instance.mainScene.Instantiate());
     }
 

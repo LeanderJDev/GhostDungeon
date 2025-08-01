@@ -9,10 +9,9 @@ public partial class CameraController : Camera2D
 
     public override void _PhysicsProcess(double delta)
     {
-        if (PlayerController.Instance != null && !IsInstanceValid(PlayerController.Instance))
-            return;
-        base._Process(delta);
         if (PlayerController.Instance == null)
+            return;
+        if (!IsInstanceValid(PlayerController.Instance))
             return;
         Position = Position.Lerp(PlayerController.Instance.Position, (float)(Speed * delta));
     }

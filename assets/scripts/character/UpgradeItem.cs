@@ -2,9 +2,23 @@ using Godot;
 
 public partial class UpgradeItem : Item
 {
-    public UpgradeType upgradeType;
+    private UpgradeType _upgradeType;
+    public UpgradeType upgradeType
+    {
+        get => _upgradeType;
+        set
+        {
+            _upgradeType = value;
+            sprite.Frame = (int)_upgradeType;
+        }
+    }
 
-    private static PackedScene upgradeItemPrefab = GD.Load<PackedScene>("res://assets/scenes/upgrade.tscn");
+    [Export]
+    private Sprite2D sprite;
+
+    private static PackedScene upgradeItemPrefab = GD.Load<PackedScene>(
+        "res://assets/scenes/upgrade.tscn"
+    );
 
     public static UpgradeItem Instantiate(UpgradeType type)
     {
@@ -16,7 +30,7 @@ public partial class UpgradeItem : Item
 
 public enum UpgradeType
 {
-    BouncyProjectiles,
-    GhostShoot,
-    WalkOnWater,
+    GhostShoot = 0,
+    WalkOnWater = 2,
+    BouncyProjectiles = 1,
 }

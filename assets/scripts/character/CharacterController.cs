@@ -61,7 +61,7 @@ public partial class CharacterController : CharacterBody2D
         TileMapLayer tilemap = WorldGenerator.Instance.walls;
 
         Vector2I tilePos = tilemap.LocalToMap(tilemap.ToLocal(Position));
-        foreach (Vector2I pos in tilemap.GetSurroundingCells(tilePos))
+        foreach (Vector2I pos in tilemap.GetSurroundingCells(tilePos).Concat(new[] { tilePos }))
         {
             int id = tilemap.GetCellSourceId(pos);
             TileData data = tilemap.GetCellTileData(pos);
@@ -102,6 +102,10 @@ public partial class CharacterController : CharacterBody2D
         {
             collectedUpgrades.Add(upgrade);
             GD.Print($"equipped upgrade of type {upgrade.upgradeType}");
+            if (upgrade.upgradeType == UpgradeType.WalkOnWater)
+            {
+                CollisionMask = 1 << 1;
+            }
         }
     }
 
@@ -150,6 +154,7 @@ public partial class CharacterController : CharacterBody2D
     public void Kill()
     {
         isDead = true;
+        moveDirection = Vector2.Zero;
         if (this is PlayerController player)
         {
             GD.Print("Dead");

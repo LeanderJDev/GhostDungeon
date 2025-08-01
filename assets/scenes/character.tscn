@@ -8,6 +8,7 @@
 radius = 7.0
 
 [node name="CharacterBody2D" type="CharacterBody2D" node_paths=PackedStringArray("itemDisplayContainer")]
+z_index = 1
 y_sort_enabled = true
 collision_layer = 4
 script = ExtResource("1_0ggam")

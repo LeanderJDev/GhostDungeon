@@ -10,6 +10,9 @@ public partial class RoomPatternParser : Node2D
     public TileMapLayer walls;
 
     [Export]
+    public TileMapLayer ground;
+
+    [Export]
     public Vector2I roomSize = new Vector2I(12, 12);
 
     private TileSet tileSet;
@@ -64,6 +67,7 @@ public partial class RoomPatternParser : Node2D
                 offsetRoom.Add(cell + position);
             }
             tileSet.AddPattern(walls.GetPattern(offsetRoom));
+            tileSet.AddPattern(ground.GetPattern(offsetRoom));
             Vector2I rightPos = position + Vector2I.Right * (roomSize - Vector2I.One);
             Vector2I downPos = position + Vector2I.Down * (roomSize - Vector2I.One);
 

@@ -309,7 +309,6 @@ public partial class EnemyController : CharacterController
     {
         if (player == null)
         {
-            GD.Print("Player not set");
             player = PlayerController.Instance;
         }
     }

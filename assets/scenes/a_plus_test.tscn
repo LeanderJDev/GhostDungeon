@@ -40,4 +40,3 @@ polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
 zoom = Vector2(0.5, 0.5)
 
 [editable path="WorldGenerator"]
-[editable path="WorldGenerator/room patterns"]
