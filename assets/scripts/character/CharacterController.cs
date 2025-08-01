@@ -18,9 +18,11 @@ public partial class CharacterController : CharacterBody2D
     public List<UpgradeItem> collectedUpgrades = [];
     public List<KeyItem> collectedKeys = [];
 
-    public bool CanWalkOnWater => collectedUpgrades.Any(x => x.upgradeType == UpgradeType.WalkOnWater);
+    public bool CanWalkOnWater =>
+        collectedUpgrades.Any(x => x.upgradeType == UpgradeType.WalkOnWater);
     public bool CanHitGhosts => collectedUpgrades.Any(x => x.upgradeType == UpgradeType.GhostShoot);
-    public bool HasBouncyProjectiles => collectedUpgrades.Any(x => x.upgradeType == UpgradeType.BouncyProjectiles);
+    public bool HasBouncyProjectiles =>
+        collectedUpgrades.Any(x => x.upgradeType == UpgradeType.BouncyProjectiles);
 
     public int maxProjectileBounces = 3;
 
@@ -55,7 +57,7 @@ public partial class CharacterController : CharacterBody2D
     protected bool CheckForChests()
     {
         Vector2I openchestAtlasPos = new(15, 6);
-        
+
         TileMapLayer tilemap = WorldGenerator.Instance.walls;
 
         Vector2I tilePos = tilemap.LocalToMap(tilemap.ToLocal(Position));
@@ -77,7 +79,7 @@ public partial class CharacterController : CharacterBody2D
     {
         //generate loot
         Random rand = new(seed);
-        Item item = (rand.Next() % 1) switch    //weiße schlüssel ausgeschlossen
+        Item item = (rand.Next() % 7) switch //weiße schlüssel ausgeschlossen
         {
             0 => KeyItem.Instantiate(KeyColor.Red),
             1 => KeyItem.Instantiate(KeyColor.Turquoise),
@@ -87,7 +89,7 @@ public partial class CharacterController : CharacterBody2D
             5 => UpgradeItem.Instantiate(UpgradeType.WalkOnWater),
             6 => UpgradeItem.Instantiate(UpgradeType.GhostShoot),
             7 => KeyItem.Instantiate(KeyColor.White),
-            _ => null
+            _ => null,
         };
 
         AddChild(item);
@@ -141,6 +143,7 @@ public partial class CharacterController : CharacterBody2D
         newProjectile.Position = GlobalPosition + direction * 12;
         newProjectile.Rotation = direction.Angle();
         newProjectile.maxBounce = HasBouncyProjectiles ? maxProjectileBounces : 0;
+        newProjectile.hitGhosts = CanHitGhosts;
         GetTree().Root.AddChild(newProjectile);
     }
 

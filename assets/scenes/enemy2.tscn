@@ -6,9 +6,9 @@
 [node name="CharacterBody2D" instance=ExtResource("1_vw1f8")]
 script = ExtResource("2_ptiho")
 EnemyType = 1
-ShootRange = 100.0
+ShootRange = 50.0
 ShootInterval = 1.0
 moveSpeed = 80
 
-[node name="Sprite2D" parent="." index="1"]
+[node name="Sprite2D" parent="." index="2"]
 modulate = Color(0.32711, 0.33614, 0.577174, 1)

@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 using Godot;
 
 public partial class Projectile : CharacterBody2D
@@ -6,7 +7,17 @@ public partial class Projectile : CharacterBody2D
     private int speed = 200;
     private Vector2 direction;
     public int maxBounce;
-    public bool hitGhosts;
+    private bool _hitGhosts = false;
+    public bool hitGhosts
+    {
+        get { return _hitGhosts; }
+        set
+        {
+            if (value)
+                CollisionMask |= 1 << 4;
+            _hitGhosts = value;
+        }
+    }
 
     public override void _Ready()
     {

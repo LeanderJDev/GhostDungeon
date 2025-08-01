@@ -10,11 +10,12 @@ public partial class KeyItem : Item
         set
         {
             _color = value;
-            sprite.Frame = (int)_color;
+            sprite.Frame = (int)_color - 1;
         }
-            
     }
-    [Export] private Sprite2D sprite;
+
+    [Export]
+    private Sprite2D sprite;
 
     private static PackedScene keyPrefab = GD.Load<PackedScene>("res://assets/scenes/key.tscn");
 

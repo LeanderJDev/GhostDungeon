@@ -9,8 +9,11 @@ script = ExtResource("1_igga6")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(1, 0.00784314, 0, 1)
+light_mask = 4
 texture_filter = 1
+position = Vector2(0, 8)
 texture = ExtResource("2_l6dx6")
+offset = Vector2(0, -8)
 hframes = 2
 vframes = 2
 frame = 3

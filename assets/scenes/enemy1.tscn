@@ -6,7 +6,7 @@
 [node name="CharacterBody2D" instance=ExtResource("1_3idau")]
 script = ExtResource("2_pcort")
 EnemyType = 0
-ShootRange = 100.0
+ShootRange = 80.0
 ShootInterval = 1.0
 moveSpeed = 50
 

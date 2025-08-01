@@ -9,6 +9,7 @@
 script = ExtResource("1_s027a")
 ghost = ExtResource("2_14505")
 immortal = false
+moveSpeed = 100
 
 [node name="PointLight2D" type="PointLight2D" parent="." index="1"]
 show_behind_parent = true
@@ -21,3 +22,7 @@ texture = ExtResource("4_4wcc8")
 [node name="Sprite2D" parent="." index="2"]
 modulate = Color(1, 1, 1, 1)
 light_mask = 2
+
+[node name="itemContainer" parent="." index="3"]
+light_mask = 2
+y_sort_enabled = true

@@ -17,6 +17,9 @@ itemDisplayContainer = NodePath("itemContainer")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_sopgx")
 
+[node name="itemContainer" type="Node2D" parent="."]
+position = Vector2(0, -17)
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
@@ -26,6 +29,3 @@ texture = ExtResource("2_15r03")
 offset = Vector2(0, -12)
 hframes = 16
 frame = 1
-
-[node name="itemContainer" type="Node2D" parent="."]
-position = Vector2(0, -17)

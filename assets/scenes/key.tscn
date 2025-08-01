@@ -9,8 +9,11 @@ script = ExtResource("1_eqs4p")
 sprite = NodePath("Sprite2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+light_mask = 4
 texture_filter = 1
+position = Vector2(0, 8)
 texture = ExtResource("2_frhpv")
+offset = Vector2(0, -8)
 hframes = 2
 vframes = 2
 frame = 3

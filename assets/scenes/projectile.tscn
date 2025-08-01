@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://c2vdvaj36c6so"]
+[gd_scene load_steps=5 format=3 uid="uid://c2vdvaj36c6so"]
 
 [ext_resource type="Script" uid="uid://nsrsq2wiav5l" path="res://assets/scripts/Projectile.cs" id="1_scc3m"]
-[ext_resource type="Texture2D" uid="uid://b2ovnqqjruk52" path="res://assets/art/projectile_prototype.png" id="1_uxq6y"]
+[ext_resource type="Texture2D" uid="uid://1fk05jfx0fb1" path="res://assets/art/tiles.png" id="2_ldy4p"]
+[ext_resource type="Texture2D" uid="uid://ccsh3n4twpwlt" path="res://assets/art/neutral_point_light.webp" id="3_ldy4p"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uyx3v"]
 radius = 2.0
@@ -16,4 +17,13 @@ shape = SubResource("CircleShape2D_uyx3v")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
-texture = ExtResource("1_uxq6y")
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_ldy4p")
+region_enabled = true
+region_rect = Rect2(224, 0, 16, 16)
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(0, -1)
+color = Color(0.308, 0, 0.84, 1)
+texture = ExtResource("3_ldy4p")
+texture_scale = 0.2

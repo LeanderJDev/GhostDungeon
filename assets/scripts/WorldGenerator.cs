@@ -10,6 +10,19 @@ Items
 Traps
 
 Löcher füllen
+
+
+
+ToDo
+Character Customization
+Main Menu
+OnWater Powerup
+Powerup Sprites
+Character Animations
+Traps
+Door Sprite Fixes
+Enemy Spawner
+Loop Manager
 */
 
 public partial class WorldGenerator : Node2D
@@ -204,14 +217,14 @@ public partial class WorldGenerator : Node2D
         GD.Print($"[Time] FillGaps: {sw.ElapsedMilliseconds} ms");
 
         sw.Restart();
-        UpdateDoors();
-        sw.Stop();
-        GD.Print($"[Time] UpdateDoors: {sw.ElapsedMilliseconds} ms");
-
-        sw.Restart();
         UpdateTiles();
         sw.Stop();
         GD.Print($"[Time] UpdateTiles: {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        UpdateDoors();
+        sw.Stop();
+        GD.Print($"[Time] UpdateDoors: {sw.ElapsedMilliseconds} ms");
 
         sw.Restart();
         SpawnPlayer();
@@ -533,11 +546,19 @@ public partial class WorldGenerator : Node2D
     private void SetDoor(Vector2I position, Vector2I direction, int open = 0)
     {
         Vector2[] doorCoords = direction.X == 0 ? verticalDoorCoords : horizontalDoorCoords;
+        // Use a seeded random based on the position for deterministic door color
+        int seed = position.GetHashCode();
+        Random doorRandom = new Random(seed);
+        int doorColor = doorRandom.Next(1, 5);
 
-        walls.SetCell(new Vector2I(position.X, position.Y), 1, (Vector2I)doorCoords[open * 2]);
+        walls.SetCell(
+            new Vector2I(position.X, position.Y),
+            doorColor,
+            (Vector2I)doorCoords[open * 2]
+        );
         walls.SetCell(
             new Vector2I(position.X + direction.X, position.Y + direction.Y),
-            1,
+            doorColor,
             (Vector2I)doorCoords[open * 2 + 1]
         );
         // Statt direktem Update: Tiles im Umfeld batchen (ohne Türtiles, keine Duplikate)
@@ -608,6 +629,8 @@ public partial class WorldGenerator : Node2D
 
     private bool IsValidTile(int sourceId, Vector2I atlasCoords)
     {
+        if (sourceId < 0 || sourceId >= tileSet.GetSourceCount())
+            return false;
         TileSetAtlasSource source = tileSet.GetSource(sourceId) as TileSetAtlasSource;
         if (source == null)
             return false;
