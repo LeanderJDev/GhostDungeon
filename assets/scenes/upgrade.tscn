@@ -15,4 +15,4 @@ hframes = 2
 vframes = 2
 frame = 3
 region_enabled = true
-region_rect = Rect2(128, 64, 32, 32)
+region_rect = Rect2(224, 64, 32, 32)
