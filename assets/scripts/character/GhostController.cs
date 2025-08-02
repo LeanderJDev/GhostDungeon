@@ -7,8 +7,19 @@ public partial class GhostController : CharacterController
     private int pathIndex = 0;
     private Vector2 targetPosition;
 
+    [Export]
+    public Node2D ghostSprite;
+
+    private Vector2 ghostPosition;
+
     public override void _Ready()
     {
+        if (ghostSprite == null)
+        {
+            GD.PrintErr("Ghost sprite not set in GhostController.");
+            return;
+        }
+        ghostPosition = Position;
         base._Ready();
     }
 
@@ -38,10 +49,13 @@ public partial class GhostController : CharacterController
                             Shoot(action.direction);
                             break;
                         case CharacterActionType.ItemPickup:
-                            CheckForChests();
+                            OpenChest((Vector2I)action.direction);
                             break;
                         case CharacterActionType.DoorOpen:
-                            CheckAndUseDoors();
+                            OpenDoor((Vector2I)action.direction);
+                            break;
+                        case CharacterActionType.AntiSoftlock:
+                            OpenChest((Vector2I)action.direction);
                             break;
                     }
                 }
@@ -52,6 +66,11 @@ public partial class GhostController : CharacterController
         {
             QueueFree();
         }
+
         base._PhysicsProcess(delta);
+
+        float lagSpeed = 2f; // je kleiner, desto mehr "Lag"
+        ghostPosition = ghostPosition.Lerp(Position, (float)(delta * lagSpeed));
+        ghostSprite.GlobalPosition = ghostPosition;
     }
 }

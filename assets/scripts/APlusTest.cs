@@ -74,9 +74,6 @@ public partial class APlusTest : Node2D
             targetMarker.GlobalPosition
         );
 
-        startMarker.GlobalPosition = currentResult.path[0];
-        targetMarker.GlobalPosition = currentResult.path[^1];
-
         // Visualisierung der Tiles auf dem TileMapLayer
         visulaiseLayer.Clear();
         visulaiseLayer.SetCell(Vector2I.Zero, 0, new Vector2I(0, 0));
@@ -87,6 +84,8 @@ public partial class APlusTest : Node2D
         }
         if (currentResult.path != null && currentResult.path.Count > 1)
         {
+            startMarker.GlobalPosition = currentResult.path[0];
+            targetMarker.GlobalPosition = currentResult.path[^1];
             GD.Print($"Path found with {currentResult.path.Count} nodes.");
             // Visualize the path with tiles using AtlasCoord (3,0)
             foreach (Vector2 pos in currentResult.path)

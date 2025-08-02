@@ -3,11 +3,11 @@
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_rt4f0"]
 [ext_resource type="Script" uid="uid://bjoxinxbq8poi" path="res://assets/scripts/character/GhostController.cs" id="1_sopgx"]
 
-[node name="CharacterBody2D" instance=ExtResource("1_rt4f0")]
+[node name="ghost" node_paths=PackedStringArray("ghostSprite") instance=ExtResource("1_rt4f0")]
 collision_layer = 16
 script = ExtResource("1_sopgx")
-moveSpeed = 100
-lerpSpeed = 0.15
+ghostSprite = NodePath("sprite wrapper")
+moveSpeed = 120
 
-[node name="Sprite2D" parent="." index="2"]
-modulate = Color(0.681213, 0.803951, 1, 0.72549)
+[node name="AnimatedSprite2D" parent="sprite wrapper" index="0"]
+self_modulate = Color(0.74, 0.87, 1, 0.741176)

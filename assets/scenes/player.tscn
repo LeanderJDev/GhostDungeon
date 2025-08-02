@@ -19,14 +19,6 @@ shadow_enabled = true
 shadow_color = Color(0, 0, 0, 1)
 texture = ExtResource("4_4wcc8")
 
-[node name="itemContainer" parent="." index="2"]
-light_mask = 2
-y_sort_enabled = true
-
-[node name="Sprite2D" parent="." index="3"]
+[node name="AnimatedSprite2D" parent="sprite wrapper" index="0"]
 modulate = Color(1, 1, 1, 1)
-light_mask = 2
-
-[node name="AnimatedSprite2D" parent="." index="4"]
-modulate = Color(1, 1, 1, 1)
-light_mask = 2
+light_mask = 4

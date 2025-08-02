@@ -11,8 +11,10 @@ script = ExtResource("1_wq1vm")
 enemy = NodePath("CharacterBody2D")
 visulaiseLayer = NodePath("WorldGenerator/room patterns/TileMapLayer")
 
-[node name="CharacterBody2D" parent="." instance=ExtResource("1_maeo0")]
+[node name="CharacterBody2D" parent="." node_paths=PackedStringArray("sprite", "itemDisplayContainer") instance=ExtResource("1_maeo0")]
 position = Vector2(32, 32)
+sprite = NodePath("AnimatedSprite2D")
+itemDisplayContainer = NodePath("itemContainer")
 
 [node name="WorldGenerator" parent="." instance=ExtResource("3_xv3yw")]
 debugSeed = 3

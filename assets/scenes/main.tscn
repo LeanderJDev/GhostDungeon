@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://0j6c2f573wy6" path="res://assets/scenes/game_over_screen.tscn" id="3_sfrgt"]
 
 [node name="main" type="Node2D"]
+process_mode = 1
 y_sort_enabled = true
 
 [node name="WorldGenerator" parent="." instance=ExtResource("3_dfgan")]
@@ -21,8 +22,10 @@ visible = false
 color = Color(0.190762, 0.190762, 0.190762, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+process_mode = 3
 
 [node name="GameOverScreen" parent="CanvasLayer" instance=ExtResource("3_sfrgt")]
+process_mode = 3
 offset_left = -12.0
 offset_top = 41.0
 offset_right = -12.0

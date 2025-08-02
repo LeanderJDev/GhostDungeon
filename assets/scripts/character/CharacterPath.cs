@@ -12,6 +12,7 @@ public enum CharacterActionType
     Shoot = 0,
     ItemPickup = 1,
     DoorOpen = 2,
+    AntiSoftlock = 3,
 }
 
 public struct CharacterAction

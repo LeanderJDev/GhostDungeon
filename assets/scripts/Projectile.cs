@@ -53,16 +53,10 @@ public partial class Projectile : CharacterBody2D
             Node2D body = (Node2D)collisionInfo.GetCollider();
             if (body.Name == "hitbox")
             {
-                GD.Print("Hitbox detected, getting parent");
                 body = (Node2D)body.GetParent();
             }
             if (body is CharacterController characterController)
             {
-                GD.Print(
-                    "Hit character controller: " + characterController.GetType(),
-                    ", Checking for immunity: ",
-                    _shooter.GetType()
-                );
                 // Immunität gegen Schützen für 200ms
                 if (
                     _shooter != null

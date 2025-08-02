@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="3_l03wl"]
 
 [node name="metaMain" type="Node2D" node_paths=PackedStringArray("mainMenu")]
+process_mode = 3
 script = ExtResource("1_w5kng")
 mainScene = ExtResource("2_8fi1s")
 ghostScene = ExtResource("3_l03wl")
@@ -14,12 +15,11 @@ mainMenu = NodePath("CanvasLayer")
 visible = false
 
 [node name="PanelContainer" type="PanelContainer" parent="CanvasLayer"]
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Button" type="Button" parent="CanvasLayer"]
-anchors_preset = -1
 offset_left = 440.0
 offset_top = 288.0
 offset_right = 728.0

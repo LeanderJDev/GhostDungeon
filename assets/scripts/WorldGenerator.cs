@@ -465,7 +465,7 @@ public partial class WorldGenerator : Node2D
     {
         Vector2[] doorCoords = direction.X == 0 ? verticalDoorCoords : horizontalDoorCoords;
         // Use a seeded random based on the position for deterministic door color
-        int seed = position.GetHashCode();
+        int seed = (position + direction).GetHashCode();
         Random doorRandom = new Random(seed);
         int doorColor = doorRandom.Next(1, 6);
         if (doorColor > 4)
@@ -497,13 +497,14 @@ public partial class WorldGenerator : Node2D
             // Spielerraum überspringen
             if (playerRoomSaved != null && room == playerRoomSaved.Value)
                 continue;
-            int enemyCount = random.Next(1, 6);
+            Random enemyRandom = new Random(room.GetHashCode());
+            int enemyCount = enemyRandom.Next(1, 6);
             int maxEnemyTries = roomCount * 6;
             int tries = 0;
             while (enemyCount > 0 && tries < maxEnemyTries)
             {
-                int x = random.Next(1, roomSize.X - 1);
-                int y = random.Next(1, roomSize.Y - 1);
+                int x = enemyRandom.Next(1, roomSize.X - 1);
+                int y = enemyRandom.Next(1, roomSize.Y - 1);
                 Vector2I localPos = new Vector2I(x, y);
                 Vector2I worldPos = room + localPos;
                 if (!CheckSpace(walls, ground, worldPos))
@@ -513,7 +514,7 @@ public partial class WorldGenerator : Node2D
                 }
                 if (enemies.Length > 0)
                 {
-                    var enemyScene = enemies[random.Next(enemies.Length)];
+                    var enemyScene = enemies[enemyRandom.Next(enemies.Length)];
                     var enemy = enemyScene.Instantiate<Node2D>();
                     enemy.Position = worldPos * walls.TileSet.TileSize + Vector2.Up * 6 + Position;
                     GetParent().CallDeferred("add_child", enemy);
@@ -530,6 +531,10 @@ public partial class WorldGenerator : Node2D
         }
     }
 
+    /*
+    CheckSpace:
+    Die Methode ist robust, aber du könntest sie als Extension-Method für TileMapLayer schreiben, um sie überall einfacher zu nutzen.
+    */
     public static bool CheckSpace(
         TileMapLayer wallTileMap,
         TileMapLayer groundTileMap,

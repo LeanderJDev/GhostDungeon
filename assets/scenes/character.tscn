@@ -8,6 +8,10 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_sopgx"]
 radius = 6.0
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6po5b"]
+radius = 7.0
+height = 24.0
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_m4ygc"]
 atlas = ExtResource("4_6po5b")
 region = Rect2(0, 0, 16, 32)
@@ -165,27 +169,39 @@ animations = [{
 "speed": 8.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6po5b"]
-radius = 7.0
-height = 24.0
-
-[node name="shooting_enemy" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "itemDisplayContainer")]
+[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "itemDisplayContainer")]
 z_index = 1
 y_sort_enabled = true
 collision_layer = 4
 script = ExtResource("1_0ggam")
 projectile = ExtResource("2_6po5b")
-sprite = NodePath("AnimatedSprite2D")
-itemDisplayContainer = NodePath("itemContainer")
+sprite = NodePath("sprite wrapper/AnimatedSprite2D")
+itemDisplayContainer = NodePath("sprite wrapper/itemContainer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 6)
 shape = SubResource("CircleShape2D_sopgx")
 
-[node name="itemContainer" type="Node2D" parent="."]
-position = Vector2(0, -19)
+[node name="hitbox" type="StaticBody2D" parent="."]
+position = Vector2(0, -4)
+collision_layer = 32
+collision_mask = 32
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="hitbox"]
+shape = SubResource("CapsuleShape2D_6po5b")
+
+[node name="sprite wrapper" type="Node2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="sprite wrapper"]
+modulate = Color(0.6, 0.6, 0.6, 1)
+y_sort_enabled = true
+texture_filter = 1
+position = Vector2(0, 12)
+sprite_frames = SubResource("SpriteFrames_kgie5")
+animation = &"idle_down"
+offset = Vector2(0, -16)
+
+[node name="Sprite2D" type="Sprite2D" parent="sprite wrapper"]
 visible = false
 modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
@@ -196,19 +212,5 @@ offset = Vector2(0, -12)
 hframes = 16
 frame = 1
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-modulate = Color(0.6, 0.6, 0.6, 1)
-y_sort_enabled = true
-texture_filter = 1
-position = Vector2(0, 12)
-sprite_frames = SubResource("SpriteFrames_kgie5")
-animation = &"shoot_right"
-offset = Vector2(0, -16)
-
-[node name="hitbox" type="StaticBody2D" parent="."]
-position = Vector2(0, -4)
-collision_layer = 32
-collision_mask = 32
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="hitbox"]
-shape = SubResource("CapsuleShape2D_6po5b")
+[node name="itemContainer" type="Node2D" parent="sprite wrapper"]
+position = Vector2(0, -19)

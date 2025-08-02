@@ -80,20 +80,8 @@ public partial class PlayerController : CharacterController
 
         if (Input.IsActionJustPressed("Interact"))
         {
-            GD.Print("checkfor chests");
-            if (CheckForChests())
-            {
-                GD.Print("chest found");
-                playerPath.actions.Add(
-                    new CharacterAction
-                    {
-                        index = playerPath.positions.Count,
-                        action = CharacterActionType.ItemPickup,
-                        direction = Vector2.Zero,
-                    }
-                );
-            }
-            if (CheckAndUseDoors())
+            Vector2I? doorPosition = CheckAndUseDoors();
+            if (doorPosition != null)
             {
                 GD.Print("opened door");
                 playerPath.actions.Add(
@@ -101,7 +89,21 @@ public partial class PlayerController : CharacterController
                     {
                         index = playerPath.positions.Count,
                         action = CharacterActionType.DoorOpen,
-                        direction = Vector2.Zero,
+                        direction = doorPosition.Value,
+                    }
+                );
+            }
+            GD.Print("checkfor chests");
+            Vector2I? chestPosition = CheckForChests();
+            if (chestPosition != null)
+            {
+                GD.Print("chest found");
+                playerPath.actions.Add(
+                    new CharacterAction
+                    {
+                        index = playerPath.positions.Count,
+                        action = CharacterActionType.ItemPickup,
+                        direction = chestPosition.Value,
                     }
                 );
             }
@@ -110,7 +112,15 @@ public partial class PlayerController : CharacterController
         if (Input.IsActionJustPressed("AntiSoftlock"))
         {
             //testing hsdjkfakd
-            OpenChest(Random.Shared.Next());
+            OpenChest(APlusPathfinder.Instance.GlobalToMap(GlobalPosition));
+            playerPath.actions.Add(
+                new CharacterAction
+                {
+                    index = playerPath.positions.Count,
+                    action = CharacterActionType.AntiSoftlock,
+                    direction = APlusPathfinder.Instance.GlobalToMap(GlobalPosition),
+                }
+            );
         }
 
         base._Process(delta);

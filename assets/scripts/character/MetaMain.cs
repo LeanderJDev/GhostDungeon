@@ -54,6 +54,7 @@ public partial class MetaMain : Node2D
                 GD.Print("Added Ghost");
             }
             Instance.AddChild(currentMainScene);
+            GetTree().Paused = false; // Unpause the game after respawn
         }
         else if (respawnNextFrame > 0)
         {
@@ -81,9 +82,10 @@ public partial class MetaMain : Node2D
     public void _GiveUp()
     {
         GD.PrintErr("gave up");
-        WorldGenerator.Seed = Time.GetDateStringFromSystem().GetHashCode();
+        WorldGenerator.Seed = Time.GetDatetimeStringFromSystem().GetHashCode();
         mainMenu.Visible = true;
         mainMenu.SetProcess(true);
+        ghostPaths.Clear();
         currentMainScene.QueueFree();
         Instance.currentMainScene = null;
     }

@@ -9,8 +9,6 @@ Wandering
 */
 public partial class EnemyController : CharacterController
 {
-    // Für Debug State-Anzeige
-
     // Für Pathfinding-Abbruch
     private int failedPathAttempts = 0;
     private const int MaxFailedPathAttempts = 5;
@@ -26,10 +24,11 @@ public partial class EnemyController : CharacterController
 
     private PlayerController player;
     private float shootTimer = 0f;
-    public List<Vector2> currentPath = new List<Vector2>();
+    public Vector2[] currentPath = Array.Empty<Vector2>();
     private int pathIndex = 0;
     private float lastPlayerPathTargetDistance = 0f;
     private const float RepathDistanceThreshold = 32f;
+    private bool hasLineOfSightToPlayer = false;
 
     // Für zufälliges Wandern (Deklarationen entfernt, da bereits vorhanden)
 
@@ -46,7 +45,7 @@ public partial class EnemyController : CharacterController
     // Für Nahkampfangriff
     private float meleeTimer = 0f;
     private const float MeleeRange = 24f;
-    private const float MeleeTime = 1.0f;
+    private const float MeleeTime = 0.5f;
 
     // Timeout für das Hängenbleiben an einem Pfadpunkt
     private float stuckTimer = 0f;
@@ -70,8 +69,9 @@ public partial class EnemyController : CharacterController
         if (player == null)
             return;
         shootTimer -= (float)delta;
+        hasLineOfSightToPlayer = HasLineOfSightToPlayer();
 
-        if (HasLineOfSightToPlayer())
+        if (hasLineOfSightToPlayer)
         {
             lastKnownPlayerPosition = player.Position;
             failedPathAttempts = 0; // Reset on sight
@@ -87,7 +87,7 @@ public partial class EnemyController : CharacterController
                 wanderTimer = 4;
                 WanderRandomly(delta);
             }
-            else if (currentPath.Count == 0)
+            else if (currentPath.Length == 0)
             {
                 failedPathAttempts++;
                 if (failedPathAttempts >= MaxFailedPathAttempts)
@@ -169,18 +169,20 @@ public partial class EnemyController : CharacterController
         // Robustere Pfadverfolgung mit Timeout pro Pfadpunkt
         if (NeedsNewPath(target))
         {
-            currentPath = APlusPathfinder.Instance.Calculate(Position, target);
+            currentPath =
+                APlusPathfinder.Instance.Calculate(Position, target)?.ToArray()
+                ?? Array.Empty<Vector2>();
             pathIndex = 0;
             stuckTimer = 0f;
         }
-        if (currentPath == null || currentPath.Count == 0)
+        if (currentPath == null || currentPath.Length == 0)
         {
             moveDirection = Vector2.Zero;
             stuckTimer = 0f;
             return false;
         }
 
-        while (pathIndex < currentPath.Count)
+        while (pathIndex < currentPath.Length)
         {
             Vector2 nextPoint = currentPath[pathIndex] + Vector2.Up * 8f; // Offset des Colliders
             Vector2 toNext = nextPoint - Position;
@@ -202,38 +204,33 @@ public partial class EnemyController : CharacterController
         }
         // Ziel erreicht
         moveDirection = Vector2.Zero;
-        currentPath.Clear();
+        currentPath = Array.Empty<Vector2>();
         stuckTimer = 0f;
         return true;
     }
 
     private bool NeedsNewPath(Vector2 target)
     {
-        return currentPath.Count == 0
+        return currentPath.Length == 0
             || (
-                currentPath.Count > 0
+                currentPath.Length > 0
                 && currentPath.Last().DistanceTo(target) > RepathDistanceThreshold
             );
     }
 
-    // ...entfernt, neue Version weiter unten...
     private void CancelPath()
     {
-        currentPath.Clear();
+        currentPath = Array.Empty<Vector2>();
         moveDirection = Vector2.Zero;
     }
 
-    // ...entfernt, neue Version weiter unten...
-    // Für Kompatibilität, falls noch irgendwo aufgerufen
     private void MovePath()
     {
-        if (currentPath.Count == 0)
+        if (currentPath.Length == 0)
             return;
         MoveToTarget(currentPath.Last(), 0);
     }
 
-    // Prüft, ob eine direkte Sichtlinie zum Spieler besteht (Raycast auf Layer 1)
-    // ...entfernt, neue Version weiter unten...
     private bool HasLineOfSightToPlayer()
     {
         PhysicsDirectSpaceState2D space = GetWorld2D().DirectSpaceState;

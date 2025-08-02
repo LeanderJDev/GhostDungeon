@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public partial class EnemyPathfindingTest : Node2D
@@ -19,7 +20,7 @@ public partial class EnemyPathfindingTest : Node2D
     {
         // Greife auf das currentPath-Feld des Enemies zu
         // (falls private: public Property oder Methode im EnemyController bereitstellen)
-        return enemy.currentPath != null ? enemy.currentPath : new List<Vector2>();
+        return enemy.currentPath != null ? enemy.currentPath.ToList() : new List<Vector2>();
     }
 
     private void UpdatePath()

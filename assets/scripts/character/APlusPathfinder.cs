@@ -29,8 +29,8 @@ public partial class APlusPathfinder : Node2D
 
     public List<Vector2> Calculate(Vector2 start, Vector2 target, bool ignoreDoors = false)
     {
-        Vector2I startNode = walls.LocalToMap(walls.ToLocal(start));
-        targetNode = walls.LocalToMap(walls.ToLocal(target));
+        Vector2I startNode = GlobalToMap(start);
+        targetNode = GlobalToMap(target);
 
         if (!IsTileWalkable(start, ignoreDoors) || !IsTileWalkable(target, ignoreDoors))
         {
@@ -65,7 +65,7 @@ public partial class APlusPathfinder : Node2D
                 Vector2I? step = current;
                 while (step != null)
                 {
-                    Vector2 tileCenter = walls.ToGlobal(walls.MapToLocal(step.Value));
+                    Vector2 tileCenter = MapToGlobal(step.Value);
                     path.Insert(0, tileCenter);
                     step = cameFrom[step.Value];
                 }
@@ -109,9 +109,11 @@ public partial class APlusPathfinder : Node2D
         };
     }
 
-    public bool IsTileWalkable(Vector2 position, bool ignoreDoors = false)
+    public bool IsTileWalkable(Vector2 position, bool ignoreDoors = false, bool isLocal = false)
     {
-        Vector2I node = walls.LocalToMap(position);
+        Vector2I node = (Vector2I)position;
+        if (!isLocal)
+            node = GlobalToMap(position);
         if (ground.GetCellSourceId(node) == -1)
             return false; // Kein Boden vorhanden
         if (walls.GetCellSourceId(node) > 0 && ignoreDoors)
@@ -128,7 +130,7 @@ public partial class APlusPathfinder : Node2D
         {
             Vector2I direction = WorldGenerator.neighbourDirections[i];
             Vector2I position = node + direction;
-            if (IsTileWalkable(walls.MapToLocal(position), ignoreDoors))
+            if (IsTileWalkable(position, ignoreDoors, isLocal: true))
             {
                 neighbours.Add(position);
             }
@@ -141,6 +143,16 @@ public partial class APlusPathfinder : Node2D
     public int ManhattanDistance(Vector2I a, Vector2I b)
     {
         return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
+    }
+
+    public Vector2I GlobalToMap(Vector2 globalPosition)
+    {
+        return walls.LocalToMap(walls.ToLocal(globalPosition));
+    }
+
+    public Vector2 MapToGlobal(Vector2I mapPosition)
+    {
+        return walls.ToGlobal(walls.MapToLocal(mapPosition));
     }
 }
 
