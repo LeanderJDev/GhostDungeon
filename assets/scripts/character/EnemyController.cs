@@ -55,6 +55,7 @@ public partial class EnemyController : CharacterController
     // ...entfernt, neue Version weiter unten...
     public override void _PhysicsProcess(double delta)
     {
+        debugState = "Nothing";
         EnsurePlayerReference();
         if (player == null)
             return;
@@ -69,20 +70,18 @@ public partial class EnemyController : CharacterController
         }
         else if (lastKnownPlayerPosition != null)
         {
-            debugState = "Move to Last Known Position";
-            GD.Print(
-                $"Lost sight of player, moving to last known position: {lastKnownPlayerPosition}, currentPath count: {currentPath.Count}"
-            );
-            if (MoveToTarget(lastKnownPlayerPosition.Value, delta, 2f))
+            debugState = "Move to Last Position \n" + pathIndex + " / " + currentPath.Count;
+            if (MoveToTarget(lastKnownPlayerPosition.Value, delta, 1f))
             {
                 lastKnownPlayerPosition = null;
                 failedPathAttempts = 0;
                 CancelPath();
-                debugState = "Wandere (nach Abbruch)";
+                debugState = "Wandering (nach Abbruch)";
                 WanderRandomly(delta);
             }
             else if (currentPath.Count == 0)
             {
+                debugState = "Path Generation Attempt";
                 failedPathAttempts++;
                 if (failedPathAttempts >= MaxFailedPathAttempts)
                 {
@@ -92,14 +91,14 @@ public partial class EnemyController : CharacterController
                     lastKnownPlayerPosition = null;
                     failedPathAttempts = 0;
                     CancelPath();
-                    debugState = "Wandere (nach Fail)";
+                    debugState = "Wandering (nach Fail)";
                     WanderRandomly(delta);
                 }
             }
         }
         else
         {
-            debugState = "Wandere";
+            debugState = "Wandering";
             failedPathAttempts = 0;
             WanderRandomly(delta);
         }
@@ -170,11 +169,13 @@ public partial class EnemyController : CharacterController
         // Robustere Pfadverfolgung
         if (NeedsNewPath(target))
         {
+            debugState += " Needs New Path";
             currentPath = APlusPathfinder.Instance.Calculate(Position, target);
             pathIndex = 0;
         }
         if (currentPath == null || currentPath.Count == 0)
         {
+            debugState += " No Path Available";
             moveDirection = Vector2.Zero;
             return false;
         }
@@ -186,6 +187,7 @@ public partial class EnemyController : CharacterController
             Vector2 toNext = nextPoint - Position;
             if (toNext.Length() > margin)
             {
+                debugState += " Next Point reached";
                 moveDirection = toNext.Normalized();
                 return false;
             }
@@ -263,8 +265,6 @@ public partial class EnemyController : CharacterController
         if (result.TryGetValue("collider", out Variant collider))
         {
             Node colliderNode = ((Godot.Variant)collider).As<Node>();
-            if (colliderNode is PlayerController character)
-                GD.Print($"Ray hit: {character.GetType()}");
             if (colliderNode != null && colliderNode.GetInstanceId() == player.GetInstanceId())
                 return true;
         }

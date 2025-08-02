@@ -46,5 +46,7 @@ public partial class DoorDuplication : Node2D
             tileSet.AddSource(newSource, i + 2);
             GD.Print($"Added door source: {newSource}");
         }
+
+        ResourceSaver.Save(tileSet, tileSet.ResourcePath);
     }
 }

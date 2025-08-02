@@ -21,6 +21,7 @@ frame = 0
 self_modulate = Color(1, 0.59, 0.59, 1)
 
 [node name="DebugText" type="RichTextLabel" parent="." index="5"]
+z_index = 1
 texture_filter = 1
 offset_left = -60.0
 offset_top = -32.0
