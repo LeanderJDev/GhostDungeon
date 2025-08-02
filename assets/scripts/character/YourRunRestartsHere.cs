@@ -18,8 +18,9 @@ public partial class YourRunRestartsHere : Control
     //vom Signal aufgerufen!
     private void ButtonPressed()
     {
+        GD.Print("restart");
         MetaMain.SetGhostPath(ghostPath);
-        MetaMain.RestartWithSameSeed();
+        MetaMain.Restart();
     }
 
     public void PlayerDead(CharacterPath playerPath)
@@ -54,6 +55,7 @@ public partial class YourRunRestartsHere : Control
     //vom Signal aufgerufen!
     private void ButtonPressedGiveUp()
     {
-        MetaMain.RestartWithDifferentSeed();
+        GD.Print("gave up");
+        MetaMain.GiveUp();
     }
 }

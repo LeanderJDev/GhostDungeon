@@ -10,10 +10,15 @@ public partial class MetaMain : Node2D
     [Export]
     public PackedScene ghostScene;
 
+    [Export]
+    public CanvasLayer mainMenu;
+
     private static MetaMain Instance;
 
     private static int respawnNextFrame = -1;
     private List<CharacterPath> ghostPaths = new();
+
+    private Node currentMainScene;
 
     public MetaMain()
     {
@@ -23,8 +28,9 @@ public partial class MetaMain : Node2D
     public override void _Ready()
     {
         base._Ready();
+        mainMenu.Visible = true;
+        mainMenu.SetProcess(true);
         WorldGenerator.Seed = Time.GetDateStringFromSystem().GetHashCode();
-        Instance.AddChild(Instance.mainScene.Instantiate());
     }
 
     public override void _PhysicsProcess(double delta)
@@ -33,15 +39,21 @@ public partial class MetaMain : Node2D
         if (respawnNextFrame == 0)
         {
             respawnNextFrame = -1;
-            Node mainScene = Instance.mainScene.Instantiate();
+            if (Instance.currentMainScene != null)
+            {
+                GD.Print("aaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhh jhjfasjhfajkhdsadjkhakjhsdfgakjsf");
+            }
+
+            currentMainScene = Instance.mainScene.Instantiate();
             foreach (CharacterPath ghostPath in ghostPaths)
             {
                 GhostController ghost = (GhostController)ghostScene.Instantiate();
                 ghost.GlobalPosition = ghostPath.positions[0];
                 ghost.ghostPath = ghostPath;
-                mainScene.AddChild(ghost);
+                currentMainScene.AddChild(ghost);
+                GD.Print("Added Ghost");
             }
-            Instance.AddChild(mainScene);
+            Instance.AddChild(currentMainScene);
         }
         else if (respawnNextFrame > 0)
         {
@@ -54,16 +66,32 @@ public partial class MetaMain : Node2D
         Instance.ghostPaths.Add(path);
     }
 
-    public static void RestartWithSameSeed()
+    public static void Restart()
     {
-        if (Instance.GetChildCount() > 0)
-            Instance.GetChild(0).QueueFree();
+        Instance.currentMainScene?.QueueFree();
+        Instance.currentMainScene = null;
         respawnNextFrame = 3;
     }
 
-    public static void RestartWithDifferentSeed()
+    public static void GiveUp()
     {
-        WorldGenerator.Seed = Random.Shared.Next();
-        RestartWithSameSeed();
+        Instance._GiveUp();
+    }
+
+    public void _GiveUp()
+    {
+        GD.PrintErr("gave up");
+        WorldGenerator.Seed = Time.GetDateStringFromSystem().GetHashCode();
+        mainMenu.Visible = true;
+        mainMenu.SetProcess(true);
+        currentMainScene.QueueFree();
+        Instance.currentMainScene = null;
+    }
+
+    public void OnMainMenuClick()
+    {
+        mainMenu.Visible = false;
+        mainMenu.SetProcess(false);
+        Restart();
     }
 }
