@@ -1,16 +1,17 @@
-[gd_scene load_steps=25 format=3 uid="uid://c553vedfj6kr"]
+[gd_scene load_steps=30 format=3 uid="uid://c553vedfj6kr"]
 
 [ext_resource type="Script" uid="uid://d1na0i15r6eg2" path="res://assets/scripts/character/CharacterController.cs" id="1_0ggam"]
 [ext_resource type="PackedScene" uid="uid://c2vdvaj36c6so" path="res://assets/scenes/projectile.tscn" id="2_6po5b"]
 [ext_resource type="Texture2D" uid="uid://daq4chyyfsxmh" path="res://assets/art/player_prototype.png" id="2_15r03"]
+[ext_resource type="AudioStream" uid="uid://c88mmuwdr1uyf" path="res://assets/sfx/door.wav" id="3_mlskq"]
 [ext_resource type="Texture2D" uid="uid://dxgx6viwwo77y" path="res://assets/art/skeleton.png" id="4_6po5b"]
+[ext_resource type="AudioStream" uid="uid://bv1fpedwn7q16" path="res://assets/sfx/upgrade.wav" id="4_ut0ej"]
+[ext_resource type="AudioStream" uid="uid://cmtrlxjq2h1c3" path="res://assets/sfx/keypickup.wav" id="5_ni0wq"]
+[ext_resource type="AudioStream" uid="uid://cswy2o4jhnpcq" path="res://assets/sfx/die.wav" id="6_k3wpx"]
+[ext_resource type="AudioStream" uid="uid://cq1sf8wj58ift" path="res://assets/sfx/shoot.wav" id="7_0yj1m"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sopgx"]
 radius = 6.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6po5b"]
-radius = 7.0
-height = 24.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m4ygc"]
 atlas = ExtResource("4_6po5b")
@@ -107,10 +108,10 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 3.0,
+"duration": 2.0,
 "texture": SubResource("AtlasTexture_gkxhq")
 }, {
-"duration": 5.0,
+"duration": 3.0,
 "texture": SubResource("AtlasTexture_bujdv")
 }],
 "loop": false,
@@ -169,26 +170,29 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "itemDisplayContainer")]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mlskq"]
+radius = 7.0
+height = 20.0
+
+[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "shootMarker", "itemDisplayContainer", "audioPlayer")]
 z_index = 1
 y_sort_enabled = true
 collision_layer = 4
 script = ExtResource("1_0ggam")
 projectile = ExtResource("2_6po5b")
 sprite = NodePath("sprite wrapper/AnimatedSprite2D")
+shootMarker = NodePath("shootMarker")
 itemDisplayContainer = NodePath("sprite wrapper/itemContainer")
+doorOpenSound = ExtResource("3_mlskq")
+powerUpSound = ExtResource("4_ut0ej")
+keyPickupSound = ExtResource("5_ni0wq")
+dieSound = ExtResource("6_k3wpx")
+shootSound = ExtResource("7_0yj1m")
+audioPlayer = NodePath("AudioStreamPlayer2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 6)
 shape = SubResource("CircleShape2D_sopgx")
-
-[node name="hitbox" type="StaticBody2D" parent="."]
-position = Vector2(0, -4)
-collision_layer = 32
-collision_mask = 32
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="hitbox"]
-shape = SubResource("CapsuleShape2D_6po5b")
 
 [node name="sprite wrapper" type="Node2D" parent="."]
 
@@ -214,3 +218,17 @@ frame = 1
 
 [node name="itemContainer" type="Node2D" parent="sprite wrapper"]
 position = Vector2(0, -19)
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+process_mode = 3
+
+[node name="shootMarker" type="Marker2D" parent="."]
+position = Vector2(0, 6)
+
+[node name="hitbox" type="StaticBody2D" parent="."]
+position = Vector2(0, 6)
+collision_layer = 32
+collision_mask = 32
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
+shape = SubResource("CapsuleShape2D_mlskq")

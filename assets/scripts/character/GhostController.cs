@@ -73,4 +73,10 @@ public partial class GhostController : CharacterController
         ghostPosition = ghostPosition.Lerp(Position, (float)(delta * lagSpeed));
         ghostSprite.GlobalPosition = ghostPosition;
     }
+
+    public override void Kill()
+    {
+        base.Kill();
+        QueueFree();
+    }
 }

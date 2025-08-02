@@ -75,6 +75,13 @@ public partial class WorldGenerator : Node2D
     // Speichert das Spielerraum für Enemy-Spawn-Exklusion
     private Vector2I? playerRoomSaved = null;
 
+    [Export]
+    public int enemySpawningRate = 25; // seconds between enemy spawns
+
+    [Export]
+    public int enemySpawningRateVariance = 5; // seconds variance
+    private double enemySpawnTimer = 20.0;
+
     public static readonly Vector2I[] neighbourDirections = new Vector2I[]
     {
         new Vector2I(0, -1), // North
@@ -135,6 +142,28 @@ public partial class WorldGenerator : Node2D
         GD.Print($"Found {roomChoices.Length} room patterns in TileSet.");
         GD.Print("Starting world generation...");
         StartGeneration();
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        enemySpawnTimer -= delta;
+        if (enemySpawnTimer <= 0.0)
+        {
+            enemySpawnTimer = random.Next(
+                enemySpawningRate - enemySpawningRateVariance,
+                enemySpawningRate + enemySpawningRateVariance
+            );
+            SpawnEnemies(0, 2, (int)Time.GetTicksMsec());
+        }
+    }
+
+    public void SpawnChest(Vector2I tilePosition)
+    {
+        walls.SetCell(
+            tilePosition,
+            0,
+            new Vector2I(14, 6) // Assuming this is the chest tile
+        );
     }
 
     int tries;
@@ -484,7 +513,7 @@ public partial class WorldGenerator : Node2D
         );
     }
 
-    private void SpawnEnemies()
+    private void SpawnEnemies(int minEnemyCount = 1, int maxEnemyCount = 5, int seed = 0)
     {
         GD.Print("Spawning Enemies");
         if (enemies == null || enemies.Length == 0)
@@ -495,11 +524,11 @@ public partial class WorldGenerator : Node2D
         foreach (Vector2I room in generatedRooms)
         {
             // Spielerraum überspringen
-            if (playerRoomSaved != null && room == playerRoomSaved.Value)
+            if (playerRoomSaved != null && room == playerRoomSaved.Value && seed == 0)
                 continue;
-            Random enemyRandom = new Random(room.GetHashCode());
-            int enemyCount = enemyRandom.Next(1, 6);
-            int maxEnemyTries = roomCount * 6;
+            Random enemyRandom = new Random(room.GetHashCode() + seed);
+            int enemyCount = enemyRandom.Next(minEnemyCount, maxEnemyCount + 1);
+            int maxEnemyTries = enemyCount * 3;
             int tries = 0;
             while (enemyCount > 0 && tries < maxEnemyTries)
             {

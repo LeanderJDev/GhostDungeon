@@ -11,7 +11,7 @@ y_sort_enabled = true
 [node name="WorldGenerator" parent="." instance=ExtResource("3_dfgan")]
 y_sort_enabled = true
 position = Vector2(0, -1)
-roomCount = 25
+enemySpawningRate = 15
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)

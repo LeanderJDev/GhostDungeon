@@ -17,6 +17,15 @@ public partial class PlayerController : CharacterController
     [Export]
     public bool immortal;
 
+    [Export]
+    public AudioStreamWav stepSound;
+
+    [Export]
+    public AudioStreamWav waterStepSound;
+
+    [Export]
+    public AudioStreamPlayer2D stepPlayer;
+
     public CharacterPath playerPath = new CharacterPath
     {
         positions = new List<Vector2>(),
@@ -130,5 +139,26 @@ public partial class PlayerController : CharacterController
     {
         base._PhysicsProcess(delta);
         playerPath.positions.Add(Position);
+        if (Velocity.Length() > 0.1f && !audioPlayer.Playing)
+        {
+            if (APlusPathfinder.Instance.IsWater(GlobalPosition))
+            {
+                PlayAudio(waterStepSound, stepPlayer);
+            }
+            else
+            {
+                PlayAudio(stepSound, stepPlayer);
+            }
+        }
+    }
+
+    public override void Kill()
+    {
+        base.Kill();
+        GD.Print("Dead");
+        if (immortal != true)
+        {
+            YourRunRestartsHere.Instance.PlayerDead(playerPath);
+        }
     }
 }
