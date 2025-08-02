@@ -70,8 +70,10 @@ public partial class GhostController : CharacterController
         base._PhysicsProcess(delta);
 
         float lagSpeed = 2f; // je kleiner, desto mehr "Lag"
+        Vector2 prePosition = ghostSprite.GlobalPosition;
         ghostPosition = ghostPosition.Lerp(Position, (float)(delta * lagSpeed));
         ghostSprite.GlobalPosition = ghostPosition;
+        UpdateAnimation(ghostSprite.GlobalPosition - prePosition);
     }
 
     public override void Kill()

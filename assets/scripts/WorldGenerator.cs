@@ -532,14 +532,24 @@ public partial class WorldGenerator : Node2D
             int tries = 0;
             while (enemyCount > 0 && tries < maxEnemyTries)
             {
+                tries++;
                 int x = enemyRandom.Next(1, roomSize.X - 1);
                 int y = enemyRandom.Next(1, roomSize.Y - 1);
                 Vector2I localPos = new Vector2I(x, y);
                 Vector2I worldPos = room + localPos;
                 if (!CheckSpace(walls, ground, worldPos))
                 {
-                    tries++;
                     continue;
+                }
+                if (
+                    PlayerController.Instance != null
+                    && PlayerController.Instance.Position.DistanceTo(
+                        worldPos * walls.TileSet.TileSize
+                    )
+                        < 16 * 3
+                )
+                {
+                    continue; // Skip if too close to player
                 }
                 if (enemies.Length > 0)
                 {
@@ -549,7 +559,6 @@ public partial class WorldGenerator : Node2D
                     GetParent().CallDeferred("add_child", enemy);
                     enemyCount--;
                 }
-                tries++;
             }
             if (tries >= maxEnemyTries && enemyCount > 0)
             {

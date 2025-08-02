@@ -79,13 +79,17 @@ public partial class PlayerController : CharacterController
             queuedShootDirection = (mouseGlobalPos - GlobalPosition).Normalized();
             if (queuedShootDirection.X > 0)
             {
-                sprite.FlipH = false;
-                shoes.FlipH = false;
+                foreach (AnimatedSprite2D sprite in sprites)
+                {
+                    sprite.FlipH = false;
+                }
             }
             else
             {
-                sprite.FlipH = true;
-                shoes.FlipH = true;
+                foreach (AnimatedSprite2D sprite in sprites)
+                {
+                    sprite.FlipH = true;
+                }
             }
         }
 
@@ -141,7 +145,7 @@ public partial class PlayerController : CharacterController
     {
         base._PhysicsProcess(delta);
         playerPath.positions.Add(Position);
-        if (Velocity.Length() > 0.1f && !audioPlayer.Playing)
+        if (Velocity.Length() > 0.1f && !stepPlayer.Playing)
         {
             if (APlusPathfinder.Instance.IsWater(GlobalPosition))
             {

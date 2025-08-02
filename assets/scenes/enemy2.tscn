@@ -3,10 +3,21 @@
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_vw1f8"]
 [ext_resource type="Script" uid="uid://tvu7j2bmjxar" path="res://assets/scripts/character/EnemyController.cs" id="2_ptiho"]
 
-[node name="shooting_enemy" node_paths=PackedStringArray("shootMarker") instance=ExtResource("1_vw1f8")]
+[node name="shooting_enemy" instance=ExtResource("1_vw1f8")]
 script = ExtResource("2_ptiho")
 EnemyType = 1
 ShootRange = 100.0
 ShootInterval = 1.0
-shootMarker = NodePath("shootMarker")
 moveSpeed = 80
+
+[node name="AnimatedShoes" parent="sprite wrapper" index="1"]
+process_mode = 4
+visible = false
+
+[node name="AnimatedHair1" parent="sprite wrapper" index="2"]
+process_mode = 4
+visible = false
+
+[node name="AnimatedHair2" parent="sprite wrapper" index="3"]
+process_mode = 4
+visible = false

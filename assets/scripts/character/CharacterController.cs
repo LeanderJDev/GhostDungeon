@@ -16,10 +16,7 @@ public partial class CharacterController : CharacterBody2D
     public PackedScene projectile;
 
     [Export]
-    public AnimatedSprite2D sprite;
-
-    [Export]
-    public AnimatedSprite2D shoes;
+    public AnimatedSprite2D[] sprites;
 
     [Export]
     public Node2D shootMarker;
@@ -106,12 +103,16 @@ public partial class CharacterController : CharacterBody2D
         UpdateAnimation();
     }
 
-    private void UpdateAnimation()
+    protected void UpdateAnimation(Vector2 velocity = default)
     {
-        if (isDead || sprite == null)
+        if (isDead || sprites == null || sprites.Length == 0)
             return;
 
-        Vector2 vel = Velocity;
+        Vector2 vel;
+        if (velocity == default)
+            vel = Velocity;
+        else
+            vel = velocity;
         string anim = "idle_down";
         bool flipH = false;
 
@@ -147,16 +148,17 @@ public partial class CharacterController : CharacterBody2D
         }
         else
         {
-            anim = sprite.Animation.ToString().Replace("walk_", "idle_");
-            flipH = sprite.FlipH;
+            anim = sprites[0].Animation.ToString().Replace("walk_", "idle_");
+            flipH = sprites[0].FlipH;
         }
-        if (sprite.Animation != anim)
+        foreach (AnimatedSprite2D sprite in sprites)
         {
-            //sprite.Play(anim);
-            shoes.Play(anim);
+            if (sprite.Animation != anim)
+            {
+                sprite.Play(anim);
+            }
+            sprite.FlipH = flipH;
         }
-        sprite.FlipH = flipH;
-        shoes.FlipH = flipH;
     }
 
     private IEnumerable<Vector2I> GetTilesInRadius(TileMapLayer tilemap, Vector2 center, int radius)
@@ -340,13 +342,15 @@ public partial class CharacterController : CharacterBody2D
         newProjectile.hitGhosts = CanHitGhosts;
         newProjectile.SetShooter(this);
         GetParent().AddChild(newProjectile);
-        sprite.Animation = "idle_right";
-        shoes.Animation = "idle_right";
+        foreach (AnimatedSprite2D sprite in sprites)
+        {
+            sprite.Animation = "idle_right";
+        }
     }
 
     private void PlayShootAnimation(Vector2 direction)
     {
-        if (sprite == null)
+        if (sprites[0] == null)
             return;
         string anim = "shoot_right";
         bool flipH = false;
@@ -359,10 +363,11 @@ public partial class CharacterController : CharacterBody2D
         {
             flipH = true;
         }
-        sprite.Play(anim);
-        sprite.FlipH = flipH;
-        shoes.Play(anim);
-        shoes.FlipH = flipH;
+        foreach (AnimatedSprite2D sprite in sprites)
+        {
+            sprite.Play(anim);
+            sprite.FlipH = flipH;
+        }
     }
 
     public virtual void Kill()
