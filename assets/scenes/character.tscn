@@ -1,12 +1,11 @@
-[gd_scene load_steps=43 format=3 uid="uid://c553vedfj6kr"]
+[gd_scene load_steps=48 format=3 uid="uid://c553vedfj6kr"]
 
 [ext_resource type="Script" uid="uid://d1na0i15r6eg2" path="res://assets/scripts/character/CharacterController.cs" id="1_0ggam"]
 [ext_resource type="PackedScene" uid="uid://c2vdvaj36c6so" path="res://assets/scenes/projectile.tscn" id="2_6po5b"]
-[ext_resource type="Texture2D" uid="uid://daq4chyyfsxmh" path="res://assets/art/player_prototype.png" id="2_15r03"]
 [ext_resource type="AudioStream" uid="uid://c88mmuwdr1uyf" path="res://assets/sfx/door.wav" id="3_mlskq"]
 [ext_resource type="Texture2D" uid="uid://dxgx6viwwo77y" path="res://assets/art/skeleton.png" id="4_6po5b"]
 [ext_resource type="Texture2D" uid="uid://b4p28v5duilfw" path="res://assets/art/MainCharacter_Shoes.png" id="4_kgie5"]
-[ext_resource type="AudioStream" uid="uid://bv1fpedwn7q16" path="res://assets/sfx/upgrade.wav" id="4_ut0ej"]
+[ext_resource type="AudioStream" uid="uid://cfpnjm4k10s31" path="res://assets/sfx/step.wav" id="4_mlskq"]
 [ext_resource type="AudioStream" uid="uid://cmtrlxjq2h1c3" path="res://assets/sfx/keypickup.wav" id="5_ni0wq"]
 [ext_resource type="AudioStream" uid="uid://cswy2o4jhnpcq" path="res://assets/sfx/die.wav" id="6_k3wpx"]
 [ext_resource type="AudioStream" uid="uid://cq1sf8wj58ift" path="res://assets/sfx/shoot.wav" id="7_0yj1m"]
@@ -328,23 +327,22 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "shoes", "itemDisplayContainer")]
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mlskq"]
 radius = 7.0
 height = 20.0
 
-[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "shootMarker", "itemDisplayContainer", "audioPlayer")]
+[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "shoes", "shootMarker", "itemDisplayContainer", "audioPlayer")]
 z_index = 1
 y_sort_enabled = true
 collision_layer = 4
 script = ExtResource("1_0ggam")
 projectile = ExtResource("2_6po5b")
-sprite = NodePath("sprite wrapper/AnimatedBody")
-shoes = NodePath("sprite wrapper/AnimatedShoes")
+sprite = NodePath("sprite wrapper/AnimatedShoes")
+shoes = NodePath("sprite wrapper/AnimatedBody")
 shootMarker = NodePath("shootMarker")
 itemDisplayContainer = NodePath("sprite wrapper/itemContainer")
 doorOpenSound = ExtResource("3_mlskq")
-powerUpSound = ExtResource("4_ut0ej")
+powerUpSound = ExtResource("4_mlskq")
 keyPickupSound = ExtResource("5_ni0wq")
 dieSound = ExtResource("6_k3wpx")
 shootSound = ExtResource("7_0yj1m")
@@ -372,7 +370,9 @@ y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
 sprite_frames = SubResource("SpriteFrames_6po5b")
-animation = &"walk_up"
+animation = &"walk_right"
+frame = 3
+frame_progress = 0.671245
 offset = Vector2(0, -16)
 
 [node name="itemContainer" type="Node2D" parent="sprite wrapper"]

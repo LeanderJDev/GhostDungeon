@@ -3,12 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_vw1f8"]
 [ext_resource type="Script" uid="uid://tvu7j2bmjxar" path="res://assets/scripts/character/EnemyController.cs" id="2_ptiho"]
 
-[node name="shooting_enemy" instance=ExtResource("1_vw1f8")]
+[node name="shooting_enemy" node_paths=PackedStringArray("shootMarker") instance=ExtResource("1_vw1f8")]
 script = ExtResource("2_ptiho")
 EnemyType = 1
 ShootRange = 100.0
 ShootInterval = 1.0
+shootMarker = NodePath("shootMarker")
 moveSpeed = 80
-
-[node name="AnimatedSprite2D" parent="sprite wrapper" index="0"]
-self_modulate = Color(0.58338, 0.5124, 0.84, 1)

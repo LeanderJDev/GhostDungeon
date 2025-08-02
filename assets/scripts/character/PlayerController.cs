@@ -80,10 +80,12 @@ public partial class PlayerController : CharacterController
             if (queuedShootDirection.X > 0)
             {
                 sprite.FlipH = false;
+                shoes.FlipH = false;
             }
             else
             {
                 sprite.FlipH = true;
+                shoes.FlipH = true;
             }
         }
 

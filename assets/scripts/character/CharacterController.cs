@@ -152,7 +152,7 @@ public partial class CharacterController : CharacterBody2D
         }
         if (sprite.Animation != anim)
         {
-            sprite.Play(anim);
+            //sprite.Play(anim);
             shoes.Play(anim);
         }
         sprite.FlipH = flipH;
@@ -341,6 +341,7 @@ public partial class CharacterController : CharacterBody2D
         newProjectile.SetShooter(this);
         GetParent().AddChild(newProjectile);
         sprite.Animation = "idle_right";
+        shoes.Animation = "idle_right";
     }
 
     private void PlayShootAnimation(Vector2 direction)
@@ -360,6 +361,8 @@ public partial class CharacterController : CharacterBody2D
         }
         sprite.Play(anim);
         sprite.FlipH = flipH;
+        shoes.Play(anim);
+        shoes.FlipH = flipH;
     }
 
     public virtual void Kill()
