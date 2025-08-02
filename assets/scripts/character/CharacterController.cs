@@ -166,6 +166,10 @@ public partial class CharacterController : CharacterBody2D
         {
             Vector2I openchestAtlasPos = new(15, 6);
             TileMapLayer tilemap = WorldGenerator.Instance.walls;
+            if (tilemap.GetCellAtlasCoords(position.Value) == openchestAtlasPos)
+            {
+                return;
+            }
             tilemap.SetCell(position.Value, 0, openchestAtlasPos);
         }
 
@@ -270,7 +274,7 @@ public partial class CharacterController : CharacterBody2D
         {
             GD.Print("door opened");
             collectedKeys.Remove(matchingKey);
-            ReleaseItemToDisplay(matchingKey);
+            ReleaseItemFromDisplay(matchingKey);
             matchingKey.QueueFree();
             bool isDoorVertical = tilemap.GetCellAtlasCoords(pos) == new Vector2I(0, 5);
             Vector2 dst = tilemap.MapToLocal(pos) - tilemap.ToLocal(Position);
@@ -348,17 +352,17 @@ public partial class CharacterController : CharacterBody2D
     private void AddItemToDisplay(KeyItem item)
     {
         item.Reparent(itemDisplayContainer, false);
-        float posDelta = collectedKeys.Count * itemDisplayWidth;
+        float posDelta = (collectedKeys.Count - 1) * itemDisplayWidth;
         item.Position = new Vector2(posDelta, 0);
         itemDisplayContainer.Position -= new Vector2(itemDisplayWidth * 0.5f, 0);
         item.Scale = new Vector2(0.5f, 0.5f);
     }
 
-    private void ReleaseItemToDisplay(KeyItem item)
+    private void ReleaseItemFromDisplay(KeyItem item)
     {
         item.Reparent(GetViewport(), false);
         item.GlobalPosition = GlobalPosition;
-        itemDisplayContainer.Position += new Vector2(itemDisplayWidth * 0.5f, 0);
+        itemDisplayContainer.Position += new Vector2(itemDisplayWidth * 0.25f, 0);
         for (int i = 0; i < collectedKeys.Count; i++)
         {
             collectedKeys[i].Position = new Vector2(i * itemDisplayWidth, 0);

@@ -14,7 +14,7 @@ public partial class Projectile : CharacterBody2D
         set
         {
             if (value)
-                CollisionMask |= 1 << 4;
+                CollisionMask |= (1 << 4) | (1 << 6);
             _hitGhosts = value;
         }
     }
@@ -60,10 +60,14 @@ public partial class Projectile : CharacterBody2D
                 // Immunität gegen Schützen für 200ms
                 if (
                     _shooter != null
-                    && characterController == _shooter
+                    && IsInstanceValid(_shooter)
+                    && characterController.GetInstanceId() == _shooter.GetInstanceId()
                     && _timeSinceShot < _shooterImmunityTime
                 )
+                {
+                    GD.Print("Projectile hit its own shooter, ignoring.");
                     return;
+                }
                 if (!hitGhosts && characterController is GhostController)
                     return;
                 characterController.Kill();
