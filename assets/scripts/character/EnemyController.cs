@@ -62,6 +62,12 @@ public partial class EnemyController : CharacterController
             wanderRng = new Random(seed);
         }
         MaxStuckTime = moveSpeed / 16f;
+        SmallDelay();
+    }
+
+    private async void SmallDelay()
+    {
+        await ToSignal(GetTree().CreateTimer(0.1f), "timeout");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -273,7 +279,7 @@ public partial class EnemyController : CharacterController
         const int minWanderInterval = 2;
         const int maxWanderInterval = 5;
         const int maxAttempts = 5;
-        const int maxWanderDistance = 3; // maximale Pfadlänge
+        const int maxWanderDistance = 6; // maximale Pfadlänge
 
         if (wanderPath == null || wanderPath.Count == 0)
         {
