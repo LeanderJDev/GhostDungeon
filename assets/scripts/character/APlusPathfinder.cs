@@ -154,6 +154,29 @@ public partial class APlusPathfinder : Node2D
     {
         return walls.ToGlobal(walls.MapToLocal(mapPosition));
     }
+
+    public bool IsWater(Vector2 globalPosition)
+    {
+        Vector2I mapPosition = GlobalToMap(globalPosition);
+        if (ground.GetCellSourceId(mapPosition) == -1)
+        {
+            return false;
+        }
+        TileData tileData = ground.GetCellTileData(mapPosition);
+        if (tileData == null)
+        {
+            return false;
+        }
+        if (tileData.TerrainSet != 0)
+        {
+            return false;
+        }
+        if (tileData.Terrain == 0)
+        {
+            return true;
+        }
+        return false;
+    }
 }
 
 public class PathNode

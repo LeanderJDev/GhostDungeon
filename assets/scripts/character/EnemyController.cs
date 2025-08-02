@@ -23,7 +23,7 @@ public partial class EnemyController : CharacterController
     public float ShootInterval = 1.0f; // Interval in seconds
 
     private PlayerController player;
-    private float shootTimer = 0f;
+    private float shootTimer = 1.0f; // Initialisiert auf den ShootInterval-Wert
     public Vector2[] currentPath = Array.Empty<Vector2>();
     private int pathIndex = 0;
     private float lastPlayerPathTargetDistance = 0f;
@@ -50,6 +50,7 @@ public partial class EnemyController : CharacterController
     // Timeout für das Hängenbleiben an einem Pfadpunkt
     private float stuckTimer = 0f;
     private float MaxStuckTime = 1.0f; // Sekunden, bis zum nächsten Punkt gesprungen wird
+    private const int MaxActiveDistance = 16 * 48;
 
     public override void _Ready()
     {
@@ -57,7 +58,7 @@ public partial class EnemyController : CharacterController
         EnsurePlayerReference();
         if (wanderRng == null)
         {
-            int seed = Position.GetHashCode();
+            int seed = APlusPathfinder.Instance.GlobalToMap(Position).GetHashCode();
             wanderRng = new Random(seed);
         }
         MaxStuckTime = moveSpeed / 16f;
@@ -68,6 +69,12 @@ public partial class EnemyController : CharacterController
         EnsurePlayerReference();
         if (player == null)
             return;
+        if (player.Position.DistanceTo(Position) > MaxActiveDistance)
+        {
+            // Deaktivieren, wenn zu weit weg
+            moveDirection = Vector2.Zero;
+            return;
+        }
         shootTimer -= (float)delta;
         hasLineOfSightToPlayer = HasLineOfSightToPlayer();
 
@@ -235,21 +242,6 @@ public partial class EnemyController : CharacterController
     {
         PhysicsDirectSpaceState2D space = GetWorld2D().DirectSpaceState;
         Vector2 playerPos = player.GlobalPosition;
-        float radius = 4f;
-        Vector2[] offsets = new Vector2[]
-        {
-            Vector2.Zero,
-            new Vector2(-radius, 0),
-            new Vector2(radius, 0),
-            new Vector2(0, -radius),
-            new Vector2(0, radius),
-        };
-        foreach (Vector2 offset in offsets)
-        {
-            Vector2 target = playerPos + offset;
-            if (RayHitsPlayer(target, space))
-                return true;
-        }
         if (RayHitsPlayer(playerPos, space))
             return true;
         return false;
@@ -257,7 +249,10 @@ public partial class EnemyController : CharacterController
 
     private bool RayHitsPlayer(Vector2 target, PhysicsDirectSpaceState2D space)
     {
-        PhysicsRayQueryParameters2D query = PhysicsRayQueryParameters2D.Create(Position, target);
+        PhysicsRayQueryParameters2D query = PhysicsRayQueryParameters2D.Create(
+            shootMarker.GlobalPosition,
+            target
+        );
         query.CollisionMask = (1 << 1) | (1 << 2);
         query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
         Godot.Collections.Dictionary result = space.IntersectRay(query);
@@ -274,12 +269,10 @@ public partial class EnemyController : CharacterController
 
     // Entfernt, da optimierte Version weiter unten
     private void WanderRandomly(double delta)
-    // State-String wird zentral in _PhysicsProcess gesetzt
-    // State-String wird zentral in _PhysicsProcess gesetzt
     {
-        const int minWanderInterval = 1;
-        const int maxWanderInterval = 4;
-        const int maxAttempts = 10;
+        const int minWanderInterval = 2;
+        const int maxWanderInterval = 5;
+        const int maxAttempts = 5;
         const int maxWanderDistance = 3; // maximale Pfadlänge
 
         if (wanderPath == null || wanderPath.Count == 0)
@@ -351,15 +344,19 @@ public partial class EnemyController : CharacterController
     {
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            float angle = (float)(wanderRng.NextDouble() * Math.PI * 2);
-            Vector2 candidateTarget =
-                Position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * maxWanderDistance * 16;
+            GD.Print("Trying to generate wander path..."); // Debugging
+            int x = wanderRng.Next(-maxWanderDistance, maxWanderDistance + 1);
+            int y = wanderRng.Next(-maxWanderDistance, maxWanderDistance + 1);
+            Vector2I candidateTarget =
+                APlusPathfinder.Instance.GlobalToMap(Position)
+                + Vector2I.Up * y
+                + Vector2I.Right * x;
 
             if (!APlusPathfinder.Instance.IsTileWalkable(candidateTarget))
                 continue;
             List<Vector2> candidatePath = APlusPathfinder.Instance.Calculate(
                 Position,
-                candidateTarget
+                APlusPathfinder.Instance.MapToGlobal(candidateTarget)
             );
             if (candidatePath != null && candidatePath.Count > 1)
             {
@@ -381,5 +378,18 @@ public partial class EnemyController : CharacterController
         {
             player = PlayerController.Instance;
         }
+    }
+
+    public override void Kill()
+    {
+        base.Kill();
+        Vector2I tilePosition = APlusPathfinder.Instance.GlobalToMap(GlobalPosition);
+        Random random = new Random(tilePosition.GetHashCode());
+        if (random.NextDouble() < 0.3)
+        {
+            WorldGenerator.Instance.SpawnChest(tilePosition);
+        }
+
+        QueueFree();
     }
 }

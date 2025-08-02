@@ -5,7 +5,7 @@ using Godot;
 public partial class Projectile : CharacterBody2D
 {
     private int speed = 200;
-    private Vector2 direction;
+    public Vector2 direction;
     public int maxBounce;
     private bool _hitGhosts = false;
     public bool hitGhosts
@@ -31,7 +31,6 @@ public partial class Projectile : CharacterBody2D
 
     public override void _Ready()
     {
-        direction = Transform.X;
         CollisionMask &= ~(1u << 5); // remove hitboxes
         CollisionMask &= ~(1u << 2); // remove entities
         base._Ready();

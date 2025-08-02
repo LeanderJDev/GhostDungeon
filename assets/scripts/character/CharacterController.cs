@@ -10,13 +10,16 @@ public partial class CharacterController : CharacterBody2D
     protected bool isShooting = false;
     protected Vector2 queuedShootDirection = Vector2.Zero;
     private float shootCooldown = 0.0f;
-    private float shootCooldownTime = 0.4f; // Dauer der Shoot-Animation in Sekunden
+    private float shootCooldownTime = 0.25f; // Dauer der Shoot-Animation in Sekunden
 
     [Export]
     public PackedScene projectile;
 
     [Export]
     public AnimatedSprite2D sprite;
+
+    [Export]
+    public Node2D shootMarker;
 
     public bool isDead;
 
@@ -39,6 +42,25 @@ public partial class CharacterController : CharacterBody2D
 
     [Export]
     public float lerpSpeed = 0.05f;
+
+    [Export]
+    public AudioStreamWav doorOpenSound;
+
+    [Export]
+    public AudioStreamWav powerUpSound;
+
+    [Export]
+    public AudioStreamWav keyPickupSound;
+
+    [Export]
+    public AudioStreamWav dieSound;
+
+    [Export]
+    public AudioStreamWav shootSound;
+
+    [Export]
+    public AudioStreamPlayer2D audioPlayer;
+
     protected Vector2 moveDirection;
     private Vector2 moveAcceleration = Vector2.Zero;
     private float maxAcceleration = 10000;
@@ -93,7 +115,7 @@ public partial class CharacterController : CharacterBody2D
         if (vel.Length() > 5f)
         {
             // Laufanimation
-            if (Mathf.Abs(vel.X) > Mathf.Abs(vel.Y))
+            if (Mathf.Abs(vel.X) * 1.2 > Mathf.Abs(vel.Y))
             {
                 // Horizontal dominiert
                 if (vel.X > 0)
@@ -209,12 +231,17 @@ public partial class CharacterController : CharacterBody2D
                 };
                 UpgradeType upgrade = upgrades[rand.Next(upgrades.Length)];
                 loot.Add(UpgradeItem.Instantiate(upgrade));
+                PlayAudio(powerUpSound);
             }
             else
             {
                 KeyColor color = possibleKeyColors[rand.Next(possibleKeyColors.Length)];
                 loot.Add(KeyItem.Instantiate(color));
             }
+        }
+        if (!audioPlayer.Playing)
+        {
+            PlayAudio(keyPickupSound);
         }
 
         foreach (Item item in loot)
@@ -262,6 +289,7 @@ public partial class CharacterController : CharacterBody2D
 
     protected bool OpenDoor(Vector2I? position = null)
     {
+        PlayAudio(doorOpenSound);
         TileMapLayer tilemap = WorldGenerator.Instance.walls;
         if (position == null)
             return false;
@@ -297,15 +325,15 @@ public partial class CharacterController : CharacterBody2D
 
     private void ActuallyShoot(Vector2 direction)
     {
+        PlayAudio(shootSound);
         Projectile newProjectile = (Projectile)projectile.Instantiate();
-        float offset = Mathf.Lerp(8, 16, Mathf.Clamp(direction.Normalized().Dot(Vector2.Up), 0, 1));
-        offset = 4;
-        newProjectile.Position = GlobalPosition + direction.Normalized() * offset;
-        newProjectile.Rotation = direction.Angle();
+        newProjectile.Position = shootMarker.GlobalPosition + direction.Normalized() * 4;
+        newProjectile.direction = direction;
         newProjectile.maxBounce = HasBouncyProjectiles ? maxProjectileBounces : 0;
         newProjectile.hitGhosts = CanHitGhosts;
         newProjectile.SetShooter(this);
         GetParent().AddChild(newProjectile);
+        sprite.Animation = "idle_right";
     }
 
     private void PlayShootAnimation(Vector2 direction)
@@ -327,24 +355,13 @@ public partial class CharacterController : CharacterBody2D
         sprite.FlipH = flipH;
     }
 
-    public void Kill()
+    public virtual void Kill()
     {
         if (isDead)
             return;
+        PlayAudio(dieSound);
         isDead = true;
         moveDirection = Vector2.Zero;
-        if (this is PlayerController player)
-        {
-            GD.Print("Dead");
-            if (player.immortal != true)
-            {
-                YourRunRestartsHere.Instance.PlayerDead(player.playerPath);
-            }
-        }
-        else
-        {
-            QueueFree();
-        }
     }
 
     const float itemDisplayWidth = 4;
@@ -368,5 +385,19 @@ public partial class CharacterController : CharacterBody2D
             collectedKeys[i].Position = new Vector2(i * itemDisplayWidth, 0);
         }
         item.Scale = new Vector2(1, 1);
+    }
+
+    protected void PlayAudio(AudioStreamWav sound, AudioStreamPlayer2D player = null)
+    {
+        if (player == null)
+        {
+            player = audioPlayer;
+        }
+        if (player == null || sound == null)
+            return;
+        player.Stream = sound;
+        // Random pitch shift between 0.9 and 1.1
+        player.PitchScale = (float)GD.RandRange(0.95, 1.05);
+        player.Play();
     }
 }
