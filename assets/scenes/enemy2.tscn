@@ -12,3 +12,6 @@ moveSpeed = 80
 
 [node name="Sprite2D" parent="." index="2"]
 modulate = Color(0.32711, 0.33614, 0.577174, 1)
+
+[node name="AnimatedSprite2D" parent="." index="3"]
+self_modulate = Color(0.73784, 0.5888, 0.92, 1)

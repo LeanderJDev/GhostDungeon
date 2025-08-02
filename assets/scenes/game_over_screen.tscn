@@ -29,7 +29,7 @@ offset_left = 30.28
 offset_top = -0.0379884
 offset_right = -28.9477
 offset_bottom = 22.962
-text = "Game Over"
+text = "You got killed"
 
 [node name="Button" type="Button" parent="Panel"]
 layout_mode = 1

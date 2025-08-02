@@ -43,7 +43,8 @@ public partial class PlayerController : CharacterController
 
     public override void _Process(double delta)
     {
-        if (isDead) return;
+        if (isDead)
+            return;
 
         Vector2 direction = Input.GetVector("Left", "Right", "Up", "Down");
 
@@ -62,6 +63,19 @@ public partial class PlayerController : CharacterController
                     direction = shootDirection,
                 }
             );
+        }
+        if (isShooting)
+        {
+            Vector2 mouseGlobalPos = GetGlobalMousePosition();
+            queuedShootDirection = (mouseGlobalPos - GlobalPosition).Normalized();
+            if (queuedShootDirection.X > 0)
+            {
+                sprite.FlipH = false;
+            }
+            else
+            {
+                sprite.FlipH = true;
+            }
         }
 
         if (Input.IsActionJustPressed("Interact"))
@@ -82,6 +96,14 @@ public partial class PlayerController : CharacterController
             if (CheckAndUseDoors())
             {
                 GD.Print("opened door");
+                playerPath.actions.Add(
+                    new CharacterAction
+                    {
+                        index = playerPath.positions.Count,
+                        action = CharacterActionType.DoorOpen,
+                        direction = Vector2.Zero,
+                    }
+                );
             }
         }
 
@@ -97,7 +119,7 @@ public partial class PlayerController : CharacterController
             };
             ghostController.ghostPath = clonedPath;
             newGhost.Position = startPosition;
-            GetTree().Root.AddChild(newGhost);
+            GetParent().AddChild(newGhost);
 
             //testing hsdjkfakd
             OpenChest(Random.Shared.Next());

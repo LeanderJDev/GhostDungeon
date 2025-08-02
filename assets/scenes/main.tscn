@@ -27,3 +27,6 @@ offset_left = -12.0
 offset_top = 41.0
 offset_right = -12.0
 offset_bottom = 41.0
+
+[editable path="WorldGenerator"]
+[editable path="WorldGenerator/room patterns"]

@@ -6,7 +6,8 @@
 [node name="CharacterBody2D" instance=ExtResource("1_rt4f0")]
 collision_layer = 16
 script = ExtResource("1_sopgx")
-lerpSpeed = 0.2
+moveSpeed = 100
+lerpSpeed = 0.15
 
 [node name="Sprite2D" parent="." index="2"]
 modulate = Color(0.681213, 0.803951, 1, 0.72549)

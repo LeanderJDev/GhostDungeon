@@ -15,7 +15,8 @@ public partial class RoomPatternParser : Node2D
     [Export]
     public Vector2I roomSize = new Vector2I(12, 12);
 
-    private TileSet tileSet;
+    [Export]
+    public TileSet tileSet;
 
     [Export]
     public bool SetupPatternsButton
@@ -30,10 +31,8 @@ public partial class RoomPatternParser : Node2D
 
     public void SetupPatterns()
     {
-        if (walls == null)
+        if (walls == null || ground == null || tileSet == null)
             return;
-
-        tileSet = walls.TileSet;
 
         Array<Vector2I> squareRoom = new Array<Vector2I>();
         for (int x = 0; x < roomSize.X; x++)
@@ -79,5 +78,7 @@ public partial class RoomPatternParser : Node2D
             if (maxIterations == 0)
                 break;
         }
+
+        ResourceSaver.Save(tileSet, tileSet.ResourcePath);
     }
 }

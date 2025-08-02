@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://kq6ll83uetxm"]
+[gd_scene load_steps=4 format=3 uid="uid://kq6ll83uetxm"]
 
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_3idau"]
 [ext_resource type="Script" uid="uid://tvu7j2bmjxar" path="res://assets/scripts/character/EnemyController.cs" id="2_pcort"]
+[ext_resource type="Texture2D" uid="uid://dxgx6viwwo77y" path="res://assets/art/skeleton.png" id="3_m4ygc"]
 
 [node name="CharacterBody2D" instance=ExtResource("1_3idau")]
 script = ExtResource("2_pcort")
@@ -11,4 +12,20 @@ ShootInterval = 1.0
 moveSpeed = 50
 
 [node name="Sprite2D" parent="." index="2"]
-modulate = Color(0.6, 0.264, 0.264, 1)
+texture = ExtResource("3_m4ygc")
+hframes = 17
+frame = 0
+
+[node name="AnimatedSprite2D" parent="." index="3"]
+self_modulate = Color(1, 0.59, 0.59, 1)
+
+[node name="DebugText" type="RichTextLabel" parent="." index="5"]
+offset_left = -22.0
+offset_top = -29.0
+offset_right = 18.0
+offset_bottom = 11.0
+theme_override_font_sizes/normal_font_size = 8
+text = "DEbug"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1

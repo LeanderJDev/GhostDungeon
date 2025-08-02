@@ -110,8 +110,6 @@ public partial class APlusPathfinder : Node2D
             return false; // Kein Boden vorhanden
         if (walls.GetCellSourceId(node) > 0 && ignoreDoors)
             return true;
-        if (walls.GetCellSourceId(node) != -1)
-            return false; // Wand vorhanden
 
         return WorldGenerator.CheckSpace(walls, ground, node);
     }

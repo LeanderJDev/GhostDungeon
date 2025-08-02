@@ -9,6 +9,13 @@ Wandering
 */
 public partial class EnemyController : CharacterController
 {
+    // Für Debug State-Anzeige
+    private string debugState = "";
+
+    // Für Pathfinding-Abbruch
+    private int failedPathAttempts = 0;
+    private const int MaxFailedPathAttempts = 5;
+
     [Export]
     public int EnemyType;
 
@@ -37,6 +44,11 @@ public partial class EnemyController : CharacterController
     private float wanderTimeout = 0f;
     private const float MaxWanderTimeout = 5f; // Sekunden bis Abbruch
 
+    // Für Nahkampfangriff
+    private float meleeTimer = 0f;
+    private const float MeleeRange = 24f;
+    private const float MeleeTime = 1.0f;
+
     // ...entfernt, neue Version weiter unten...
     public override void _PhysicsProcess(double delta)
     {
@@ -47,39 +59,86 @@ public partial class EnemyController : CharacterController
 
         if (HasLineOfSightToPlayer())
         {
+            debugState = "Engage Player";
             lastKnownPlayerPosition = player.Position;
+            failedPathAttempts = 0; // Reset on sight
             HandleEngagePlayer(delta);
         }
         else if (lastKnownPlayerPosition != null)
         {
+            debugState = "Move to Last Known Position";
+            GD.Print(
+                $"Lost sight of player, moving to last known position: {lastKnownPlayerPosition}, currentPath count: {currentPath.Count}"
+            );
             if (MoveToTarget(lastKnownPlayerPosition.Value, delta, 2f))
             {
                 lastKnownPlayerPosition = null;
+                failedPathAttempts = 0;
                 CancelPath();
+                debugState = "Wandere (nach Abbruch)";
                 WanderRandomly(delta);
+            }
+            else if (currentPath.Count == 0)
+            {
+                failedPathAttempts++;
+                if (failedPathAttempts >= MaxFailedPathAttempts)
+                {
+                    GD.Print(
+                        "Giving up on last known player position after too many failed path attempts."
+                    );
+                    lastKnownPlayerPosition = null;
+                    failedPathAttempts = 0;
+                    CancelPath();
+                    debugState = "Wandere (nach Fail)";
+                    WanderRandomly(delta);
+                }
             }
         }
         else
         {
+            debugState = "Wandere";
+            failedPathAttempts = 0;
             WanderRandomly(delta);
         }
         base._PhysicsProcess(delta);
+        QueueRedraw();
     }
 
     // Spieler verfolgen oder schießen
     // ...entfernt, neue Version weiter unten...
     private void HandleEngagePlayer(double delta)
+    // State-String wird zentral in _PhysicsProcess gesetzt
     {
         Vector2 toPlayer = player.GlobalPosition - GlobalPosition;
         float distance = toPlayer.Length();
         if (EnemyType == 0)
         {
             MoveToTarget(player.Position, delta);
+            // Nahkampfangriff
+            if (distance <= MeleeRange)
+            {
+                debugState = "Melee Attack";
+                meleeTimer += (float)delta;
+                if (meleeTimer >= MeleeTime)
+                {
+                    player.Kill();
+                    meleeTimer = 0f;
+                }
+                CancelPath();
+                moveDirection = Vector2.Zero;
+                return;
+            }
+            else
+            {
+                meleeTimer = 0f;
+            }
         }
         else if (EnemyType == 1)
         {
+            // Fernkampf
             if (distance <= ShootRange)
             {
+                debugState = "Shoot Player";
                 CancelPath();
                 TryShoot(toPlayer);
             }
@@ -102,36 +161,38 @@ public partial class EnemyController : CharacterController
     // Allgemeine Zielverfolgung (auch für letzte bekannte Position)
     // Gibt true zurück, wenn Ziel erreicht
     // ...entfernt, neue Version weiter unten...
-    private bool MoveToTarget(Vector2 target, double delta, float margin = 2f)
+    private bool MoveToTarget(Vector2 target, double delta, float margin = 1f)
+    // State-String wird zentral in _PhysicsProcess gesetzt
     {
+        // Robustere Pfadverfolgung
         if (NeedsNewPath(target))
         {
             currentPath = APlusPathfinder.Instance.Calculate(Position, target);
             pathIndex = 0;
-            if (currentPath.Count == 0)
+        }
+        if (currentPath == null || currentPath.Count == 0)
+        {
+            moveDirection = Vector2.Zero;
+            return false;
+        }
+
+        // Laufe alle Punkte im Pfad ab, bis Ziel erreicht
+        while (pathIndex < currentPath.Count)
+        {
+            Vector2 nextPoint = currentPath[pathIndex];
+            Vector2 toNext = nextPoint - Position;
+            if (toNext.Length() > margin)
             {
-                moveDirection = Vector2.Zero;
+                moveDirection = toNext.Normalized();
                 return false;
             }
-        }
-        if (pathIndex >= currentPath.Count)
-            pathIndex = currentPath.Count - 1;
-        Vector2 targetPosition = currentPath[pathIndex];
-        Vector2 direction = targetPosition - Position;
-        if (direction.Length() < margin)
-        {
+            // Punkt erreicht, zum nächsten
             pathIndex++;
-            if (pathIndex >= currentPath.Count)
-            {
-                moveDirection = Vector2.Zero;
-                currentPath.Clear();
-                return true;
-            }
-            targetPosition = currentPath[pathIndex];
-            direction = targetPosition - Position;
         }
-        moveDirection = direction.Normalized();
-        return false;
+        // Ziel erreicht
+        moveDirection = Vector2.Zero;
+        currentPath.Clear();
+        return true;
     }
 
     private bool NeedsNewPath(Vector2 target)
@@ -180,13 +241,15 @@ public partial class EnemyController : CharacterController
             if (RayHitsPlayer(target, space))
                 return true;
         }
+        if (RayHitsPlayer(playerPos, space))
+            return true;
         return false;
     }
 
     private bool RayHitsPlayer(Vector2 target, PhysicsDirectSpaceState2D space)
     {
         PhysicsRayQueryParameters2D query = PhysicsRayQueryParameters2D.Create(
-            GlobalPosition,
+            GlobalPosition + Vector2.Up * 8f,
             target
         );
         query.CollisionMask = (1 << 1) | (1 << 2);
@@ -197,6 +260,8 @@ public partial class EnemyController : CharacterController
         if (result.TryGetValue("collider", out Variant collider))
         {
             Node colliderNode = ((Godot.Variant)collider).As<Node>();
+            if (colliderNode is PlayerController character)
+                GD.Print($"Ray hit: {character.GetType()}");
             if (colliderNode != null && colliderNode.GetInstanceId() == player.GetInstanceId())
                 return true;
         }
@@ -205,12 +270,15 @@ public partial class EnemyController : CharacterController
 
     // Entfernt, da optimierte Version weiter unten
     private void WanderRandomly(double delta)
+    // State-String wird zentral in _PhysicsProcess gesetzt
+    // State-String wird zentral in _PhysicsProcess gesetzt
     {
         const int minWanderInterval = 1;
         const int maxWanderInterval = 4;
         const int maxAttempts = 10;
         const int maxWanderDistance = 3; // maximale Pfadlänge
-        wanderRng ??= new Random();
+        int seed = Position.GetHashCode();
+        wanderRng ??= new Random(seed);
 
         if (wanderPath == null || wanderPath.Count == 0)
         {
@@ -310,6 +378,25 @@ public partial class EnemyController : CharacterController
         if (player == null)
         {
             player = PlayerController.Instance;
+        }
+    }
+
+    // Debug: State-String über dem Enemy anzeigen
+
+    public override void _Draw()
+    {
+        if (!string.IsNullOrEmpty(debugState))
+        {
+            var font = (Font)ProjectSettings.GetSetting("gui/theme/default_font");
+            Vector2 offset = new Vector2(0, 0);
+            if (font != null)
+                DrawString(
+                    (Font)font,
+                    offset,
+                    debugState,
+                    HorizontalAlignment.Center,
+                    modulate: Colors.Red
+                );
         }
     }
 }

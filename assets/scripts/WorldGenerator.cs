@@ -213,14 +213,14 @@ public partial class WorldGenerator : Node2D
         GD.Print($"[Time] FillGaps: {sw.ElapsedMilliseconds} ms");
 
         sw.Restart();
-        UpdateTiles();
-        sw.Stop();
-        GD.Print($"[Time] UpdateTiles: {sw.ElapsedMilliseconds} ms");
-
-        sw.Restart();
         UpdateDoors();
         sw.Stop();
         GD.Print($"[Time] UpdateDoors: {sw.ElapsedMilliseconds} ms");
+
+        sw.Restart();
+        UpdateTiles();
+        sw.Stop();
+        GD.Print($"[Time] UpdateTiles: {sw.ElapsedMilliseconds} ms");
 
         sw.Restart();
         SpawnPlayer();
@@ -321,7 +321,7 @@ public partial class WorldGenerator : Node2D
         GD.Print($"Treasure spawn at {treasureStart}");
         GD.Print($"Player room at {playerRoom}");
         GD.Print($"Player spawn at {playerPos}");
-        walls.SetCell((Vector2I)walls.LocalToMap(treasureStart), 0, new Vector2I(14, 6));
+        walls.SetCell((Vector2I)walls.LocalToMap(treasureStart), 0, new Vector2I(16, 0));
         // Optional: Hier könnte man ein Property setzen oder ein Objekt spawnen
     }
 
@@ -352,6 +352,11 @@ public partial class WorldGenerator : Node2D
 
         // Close the door by setting wall tiles in the door area
         TileData wallTileData = walls.GetCellTileData(roomPosition);
+        if (wallTileData == null)
+        {
+            GD.PrintErr("No wall tile data found at room position.");
+            return;
+        }
         walls.SetCellsTerrainConnect(
             [
                 new Vector2I(doorStartX, doorStartY),
@@ -456,8 +461,11 @@ public partial class WorldGenerator : Node2D
         // Use a seeded random based on the position for deterministic door color
         int seed = position.GetHashCode();
         Random doorRandom = new Random(seed);
-        int doorColor = doorRandom.Next(1, 5);
-
+        int doorColor = doorRandom.Next(1, 6);
+        if (doorColor > 4)
+        {
+            doorColor = -1;
+        }
         walls.SetCell(
             new Vector2I(position.X, position.Y),
             doorColor,
@@ -483,7 +491,7 @@ public partial class WorldGenerator : Node2D
             // Spielerraum überspringen
             if (playerRoomSaved != null && room == playerRoomSaved.Value)
                 continue;
-            int enemyCount = random.Next(4);
+            int enemyCount = random.Next(1, 6);
             int maxEnemyTries = roomCount * 6;
             int tries = 0;
             while (enemyCount > 0 && tries < maxEnemyTries)
@@ -522,12 +530,15 @@ public partial class WorldGenerator : Node2D
         Vector2I position
     )
     {
-        if (wallTileMap.GetCellSourceId(position) != -1)
-            return false;
         if (groundTileMap.GetCellSourceId(position) == -1)
-            return false;
+            return false; // No ground tile, space is not walkable
         TileData groundTileData = groundTileMap.GetCellTileData(position);
         if (groundTileData != null && groundTileData.GetCollisionPolygonsCount(0) != 0)
+            return false;
+        if (wallTileMap.GetCellSourceId(position) == -1)
+            return true; // No wall tile, space is free
+        TileData wallTileData = wallTileMap.GetCellTileData(position);
+        if (wallTileData != null && wallTileData.GetCollisionPolygonsCount(0) != 0)
             return false;
         return true;
     }
@@ -573,6 +584,9 @@ public partial class WorldGenerator : Node2D
         foreach (var kv in wallsUpdateBatches)
         {
             var cells = kv.Value;
+            GD.Print(
+                $"Batching {cells.Count} cells for terrain {kv.Key.terrainSet}, {kv.Key.terrain}"
+            );
             if (cells.Count == 0)
                 continue;
             walls.SetCellsTerrainConnect([.. cells], kv.Key.terrainSet, kv.Key.terrain);
@@ -581,6 +595,9 @@ public partial class WorldGenerator : Node2D
         foreach (var kv in groundUpdateBatches)
         {
             var cells = kv.Value;
+            GD.Print(
+                $"Batching {cells.Count} cells for terrain {kv.Key.terrainSet}, {kv.Key.terrain}"
+            );
             if (cells.Count == 0)
                 continue;
             ground.SetCellsTerrainConnect([.. cells], kv.Key.terrainSet, kv.Key.terrain);

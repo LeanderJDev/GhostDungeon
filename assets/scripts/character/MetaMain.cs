@@ -7,9 +7,13 @@ public partial class MetaMain : Node2D
     [Export]
     public PackedScene mainScene;
 
+    [Export]
+    public PackedScene ghostScene;
+
     private static MetaMain Instance;
 
-    private static bool respawnNextFrame;
+    private static int respawnNextFrame = -1;
+    private List<CharacterPath> ghostPaths = new();
 
     public MetaMain()
     {
@@ -26,18 +30,35 @@ public partial class MetaMain : Node2D
     public override void _PhysicsProcess(double delta)
     {
         base._PhysicsProcess(delta);
-        if (respawnNextFrame)
+        if (respawnNextFrame == 0)
         {
-            respawnNextFrame = false;
-            Instance.AddChild(Instance.mainScene.Instantiate());
+            respawnNextFrame = -1;
+            Node mainScene = Instance.mainScene.Instantiate();
+            foreach (CharacterPath ghostPath in ghostPaths)
+            {
+                GhostController ghost = (GhostController)ghostScene.Instantiate();
+                ghost.GlobalPosition = ghostPath.positions[0];
+                ghost.ghostPath = ghostPath;
+                mainScene.AddChild(ghost);
+            }
+            Instance.AddChild(mainScene);
         }
+        else
+        {
+            respawnNextFrame--;
+        }
+    }
+
+    public static void SetGhostPath(CharacterPath path)
+    {
+        Instance.ghostPaths.Add(path);
     }
 
     public static void RestartWithSameSeed()
     {
         if (Instance.GetChildCount() > 0)
             Instance.GetChild(0).QueueFree();
-        respawnNextFrame = true;
+        respawnNextFrame = 3;
     }
 
     public static void RestartWithDifferentSeed()

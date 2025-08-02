@@ -7,8 +7,16 @@ using Musikspieler.Scripts.RecordView;
 
 public partial class CharacterController : CharacterBody2D
 {
+    protected bool isShooting = false;
+    protected Vector2 queuedShootDirection = Vector2.Zero;
+    private float shootCooldown = 0.0f;
+    private float shootCooldownTime = 0.4f; // Dauer der Shoot-Animation in Sekunden
+
     [Export]
     public PackedScene projectile;
+
+    [Export]
+    public AnimatedSprite2D sprite;
 
     public bool isDead;
 
@@ -43,6 +51,23 @@ public partial class CharacterController : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        // Blockiere Bewegung und Animation während Schuss
+        if (isShooting)
+        {
+            shootCooldown -= (float)delta;
+            if (shootCooldown <= 0.0f)
+            {
+                isShooting = false;
+                // Jetzt Projektil erzeugen
+                ActuallyShoot(queuedShootDirection);
+                queuedShootDirection = Vector2.Zero;
+            }
+            // Keine Bewegung/Animation während Schuss
+            Velocity = Vector2.Zero;
+            MoveAndSlide();
+            return;
+        }
+
         Velocity = SmoothDamp.Step(
             Velocity,
             moveDirection * moveSpeed,
@@ -52,6 +77,84 @@ public partial class CharacterController : CharacterBody2D
             (float)delta
         );
         MoveAndSlide();
+        // Animationen setzen
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
+    {
+        if (isDead || sprite == null)
+            return;
+
+        Vector2 vel = Velocity;
+        string anim = "idle_down";
+        bool flipH = false;
+
+        if (vel.Length() > 5f)
+        {
+            // Laufanimation
+            if (Mathf.Abs(vel.X) > Mathf.Abs(vel.Y))
+            {
+                // Horizontal dominiert
+                if (vel.X > 0)
+                {
+                    anim = "walk_right";
+                    flipH = false;
+                }
+                else
+                {
+                    anim = "walk_right";
+                    flipH = true;
+                }
+            }
+            else
+            {
+                // Vertikal dominiert
+                if (vel.Y > 0)
+                {
+                    anim = "walk_down";
+                }
+                else
+                {
+                    anim = "walk_up";
+                }
+            }
+        }
+        else
+        {
+            // Idle
+            Vector2 dir = moveDirection;
+            if (dir.Length() < 0.1f)
+                dir = Vector2.Down; // Default
+            if (Mathf.Abs(dir.X) > Mathf.Abs(dir.Y))
+            {
+                if (dir.X > 0)
+                {
+                    anim = "idle_right";
+                    flipH = false;
+                }
+                else
+                {
+                    anim = "idle_right";
+                    flipH = true;
+                }
+            }
+            else
+            {
+                if (dir.Y > 0)
+                {
+                    anim = "idle_down";
+                }
+                else
+                {
+                    anim = "idle_up";
+                }
+            }
+        }
+
+        if (sprite.Animation != anim)
+            sprite.Play(anim);
+        sprite.FlipH = flipH;
     }
 
     protected bool CheckForChests()
@@ -68,7 +171,7 @@ public partial class CharacterController : CharacterBody2D
             if (data != null && (string)data.GetCustomData("tileDescription") == "chest")
             {
                 tilemap.SetCell(pos, id, openchestAtlasPos);
-                OpenChest(pos.X * pos.Y);
+                OpenChest(pos.GetHashCode());
                 return true;
             }
         }
@@ -79,32 +182,65 @@ public partial class CharacterController : CharacterBody2D
     {
         //generate loot
         Random rand = new(seed);
-        Item item = (rand.Next() % 7) switch //weiße schlüssel ausgeschlossen
-        {
-            0 => KeyItem.Instantiate(KeyColor.Red),
-            1 => KeyItem.Instantiate(KeyColor.Turquoise),
-            2 => KeyItem.Instantiate(KeyColor.Green),
-            3 => KeyItem.Instantiate(KeyColor.Violet),
-            4 => UpgradeItem.Instantiate(UpgradeType.BouncyProjectiles),
-            5 => UpgradeItem.Instantiate(UpgradeType.WalkOnWater),
-            6 => UpgradeItem.Instantiate(UpgradeType.GhostShoot),
-            7 => KeyItem.Instantiate(KeyColor.White),
-            _ => null,
-        };
+        List<Item> loot = new();
 
-        AddChild(item);
-        if (item is KeyItem key)
+        int itemCount = rand.Next(1, 3); // 1-2 items
+
+        // First two items are always keys (random color except white)
+        KeyColor[] possibleKeyColors =
         {
-            collectedKeys.Add(key);
-            AddItemToDisplay(key);
+            KeyColor.Red,
+            KeyColor.Turquoise,
+            KeyColor.Green,
+            KeyColor.Violet,
+        };
+        for (int i = 0; i < Math.Min(1, itemCount); i++)
+        {
+            KeyColor color = possibleKeyColors[rand.Next(possibleKeyColors.Length)];
+            loot.Add(KeyItem.Instantiate(color));
         }
-        if (item is UpgradeItem upgrade)
+
+        // Third item (if any) has a chance to be an upgrade
+        if (itemCount == 2)
         {
-            collectedUpgrades.Add(upgrade);
-            GD.Print($"equipped upgrade of type {upgrade.upgradeType}");
-            if (upgrade.upgradeType == UpgradeType.WalkOnWater)
+            bool giveUpgrade = rand.NextDouble() < 0.5; // 70% chance for upgrade, adjust as needed
+            if (giveUpgrade)
             {
-                CollisionMask = 1 << 1;
+                UpgradeType[] upgrades =
+                {
+                    UpgradeType.BouncyProjectiles,
+                    UpgradeType.WalkOnWater,
+                    UpgradeType.GhostShoot,
+                };
+                UpgradeType upgrade = upgrades[rand.Next(upgrades.Length)];
+                loot.Add(UpgradeItem.Instantiate(upgrade));
+            }
+            else
+            {
+                KeyColor color = possibleKeyColors[rand.Next(possibleKeyColors.Length)];
+                loot.Add(KeyItem.Instantiate(color));
+            }
+        }
+
+        foreach (Item item in loot)
+        {
+            if (item != null)
+            {
+                AddChild(item);
+                if (item is KeyItem key)
+                {
+                    collectedKeys.Add(key);
+                    AddItemToDisplay(key);
+                }
+                if (item is UpgradeItem upgrade)
+                {
+                    collectedUpgrades.Add(upgrade);
+                    GD.Print($"equipped upgrade of type {upgrade.upgradeType}");
+                    if (upgrade.upgradeType == UpgradeType.WalkOnWater)
+                    {
+                        CollisionMask = 1 << 1;
+                    }
+                }
             }
         }
     }
@@ -143,16 +279,50 @@ public partial class CharacterController : CharacterBody2D
 
     public void Shoot(Vector2 direction)
     {
+        if (isShooting)
+            return;
+        isShooting = true;
+        shootCooldown = shootCooldownTime;
+        queuedShootDirection = direction;
+        PlayShootAnimation(direction);
+    }
+
+    private void ActuallyShoot(Vector2 direction)
+    {
         Projectile newProjectile = (Projectile)projectile.Instantiate();
-        newProjectile.Position = GlobalPosition + direction * 12;
+        float offset = Mathf.Lerp(8, 16, Mathf.Clamp(direction.Normalized().Dot(Vector2.Up), 0, 1));
+        offset = 4;
+        newProjectile.Position = GlobalPosition + direction.Normalized() * offset;
         newProjectile.Rotation = direction.Angle();
         newProjectile.maxBounce = HasBouncyProjectiles ? maxProjectileBounces : 0;
         newProjectile.hitGhosts = CanHitGhosts;
-        GetTree().Root.AddChild(newProjectile);
+        newProjectile.SetShooter(this);
+        GetParent().AddChild(newProjectile);
+    }
+
+    private void PlayShootAnimation(Vector2 direction)
+    {
+        if (sprite == null)
+            return;
+        string anim = "shoot_right";
+        bool flipH = false;
+
+        if (direction.X > 0)
+        {
+            flipH = false;
+        }
+        else
+        {
+            flipH = true;
+        }
+        sprite.Play(anim);
+        sprite.FlipH = flipH;
     }
 
     public void Kill()
     {
+        if (isDead)
+            return;
         isDead = true;
         moveDirection = Vector2.Zero;
         if (this is PlayerController player)
@@ -160,7 +330,7 @@ public partial class CharacterController : CharacterBody2D
             GD.Print("Dead");
             if (player.immortal != true)
             {
-                YourRunRestartsHere.Instance.PlayerDead();
+                YourRunRestartsHere.Instance.PlayerDead(player.playerPath);
             }
         }
         else

@@ -40,6 +40,9 @@ public partial class GhostController : CharacterController
                         case CharacterActionType.ItemPickup:
                             CheckForChests();
                             break;
+                        case CharacterActionType.DoorOpen:
+                            CheckAndUseDoors();
+                            break;
                     }
                 }
             }
