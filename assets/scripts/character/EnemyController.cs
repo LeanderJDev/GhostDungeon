@@ -25,6 +25,9 @@ public partial class EnemyController : CharacterController
     [Export]
     public float ShootInterval = 1.0f; // Interval in seconds
 
+    [Export]
+    public RichTextLabel debugLabel;
+
     private PlayerController player;
     private float shootTimer = 0f;
     private List<Vector2> currentPath = new List<Vector2>();
@@ -387,16 +390,7 @@ public partial class EnemyController : CharacterController
     {
         if (!string.IsNullOrEmpty(debugState))
         {
-            var font = (Font)ProjectSettings.GetSetting("gui/theme/default_font");
-            Vector2 offset = new Vector2(0, 0);
-            if (font != null)
-                DrawString(
-                    (Font)font,
-                    offset,
-                    debugState,
-                    HorizontalAlignment.Center,
-                    modulate: Colors.Red
-                );
+            debugLabel.Text = debugState;
         }
     }
 }

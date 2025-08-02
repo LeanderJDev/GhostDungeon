@@ -43,7 +43,7 @@ public partial class MetaMain : Node2D
             }
             Instance.AddChild(mainScene);
         }
-        else
+        else if (respawnNextFrame > 0)
         {
             respawnNextFrame--;
         }

@@ -4,11 +4,12 @@
 [ext_resource type="Script" uid="uid://tvu7j2bmjxar" path="res://assets/scripts/character/EnemyController.cs" id="2_pcort"]
 [ext_resource type="Texture2D" uid="uid://dxgx6viwwo77y" path="res://assets/art/skeleton.png" id="3_m4ygc"]
 
-[node name="CharacterBody2D" instance=ExtResource("1_3idau")]
+[node name="CharacterBody2D" node_paths=PackedStringArray("debugLabel") instance=ExtResource("1_3idau")]
 script = ExtResource("2_pcort")
 EnemyType = 0
 ShootRange = 80.0
 ShootInterval = 1.0
+debugLabel = NodePath("DebugText")
 moveSpeed = 50
 
 [node name="Sprite2D" parent="." index="2"]
@@ -20,11 +21,12 @@ frame = 0
 self_modulate = Color(1, 0.59, 0.59, 1)
 
 [node name="DebugText" type="RichTextLabel" parent="." index="5"]
-offset_left = -22.0
-offset_top = -29.0
-offset_right = 18.0
-offset_bottom = 11.0
-theme_override_font_sizes/normal_font_size = 8
+texture_filter = 1
+offset_left = -60.0
+offset_top = -32.0
+offset_right = 60.0
+offset_bottom = 8.0
+theme_override_font_sizes/normal_font_size = 12
 text = "DEbug"
 fit_content = true
 scroll_active = false
