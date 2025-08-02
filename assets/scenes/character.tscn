@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dxgx6viwwo77y" path="res://assets/art/skeleton.png" id="4_6po5b"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sopgx"]
-radius = 7.0
+radius = 6.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m4ygc"]
 atlas = ExtResource("4_6po5b")
@@ -169,7 +169,7 @@ animations = [{
 radius = 7.0
 height = 24.0
 
-[node name="CharacterBody2D" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "itemDisplayContainer")]
+[node name="shooting_enemy" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "itemDisplayContainer")]
 z_index = 1
 y_sort_enabled = true
 collision_layer = 4
@@ -183,7 +183,7 @@ position = Vector2(0, 6)
 shape = SubResource("CircleShape2D_sopgx")
 
 [node name="itemContainer" type="Node2D" parent="."]
-position = Vector2(0, -17)
+position = Vector2(0, -19)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 visible = false

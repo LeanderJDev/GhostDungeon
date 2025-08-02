@@ -20,7 +20,7 @@ public partial class Projectile : CharacterBody2D
     }
 
     private Node2D _shooter;
-    private double _shooterImmunityTime = 0.1; // 200ms
+    private double _shooterImmunityTime = 0.1; // 50ms
     private double _timeSinceShot = 0.0;
 
     public void SetShooter(Node2D shooter)

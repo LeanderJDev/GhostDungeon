@@ -37,6 +37,6 @@ color = Color(0.974745, 0.348205, 0.364613, 1)
 polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.5, 0.5)
+zoom = Vector2(2, 2)
 
 [editable path="WorldGenerator"]

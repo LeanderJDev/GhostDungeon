@@ -107,20 +107,8 @@ public partial class PlayerController : CharacterController
             }
         }
 
-        if (Input.IsActionJustPressed("ui_accept"))
+        if (Input.IsActionJustPressed("AntiSoftlock"))
         {
-            Node2D newGhost = (Node2D)ghost.Instantiate();
-            GhostController ghostController = (GhostController)newGhost;
-            // Clone the playerPath to avoid sharing the same reference
-            CharacterPath clonedPath = new CharacterPath
-            {
-                positions = new List<Vector2>(playerPath.positions),
-                actions = new List<CharacterAction>(playerPath.actions),
-            };
-            ghostController.ghostPath = clonedPath;
-            newGhost.Position = startPosition;
-            GetParent().AddChild(newGhost);
-
             //testing hsdjkfakd
             OpenChest(Random.Shared.Next());
         }

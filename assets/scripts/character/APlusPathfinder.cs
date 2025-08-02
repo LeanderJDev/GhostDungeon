@@ -29,8 +29,13 @@ public partial class APlusPathfinder : Node2D
 
     public List<Vector2> Calculate(Vector2 start, Vector2 target, bool ignoreDoors = false)
     {
-        Vector2I startNode = walls.LocalToMap(start);
-        targetNode = walls.LocalToMap(target);
+        Vector2I startNode = walls.LocalToMap(walls.ToLocal(start));
+        targetNode = walls.LocalToMap(walls.ToLocal(target));
+
+        if (!IsTileWalkable(start, ignoreDoors) || !IsTileWalkable(target, ignoreDoors))
+        {
+            return new List<Vector2>();
+        }
 
         // PriorityQueue für offene Knoten
         PriorityQueue<Vector2I, int> openQueue = new PriorityQueue<Vector2I, int>();
@@ -60,7 +65,8 @@ public partial class APlusPathfinder : Node2D
                 Vector2I? step = current;
                 while (step != null)
                 {
-                    path.Insert(0, walls.ToGlobal(walls.MapToLocal(step.Value)));
+                    Vector2 tileCenter = walls.ToGlobal(walls.MapToLocal(step.Value));
+                    path.Insert(0, tileCenter);
                     step = cameFrom[step.Value];
                 }
                 // GD.Print("Path found");

@@ -3,12 +3,11 @@
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_vw1f8"]
 [ext_resource type="Script" uid="uid://tvu7j2bmjxar" path="res://assets/scripts/character/EnemyController.cs" id="2_ptiho"]
 
-[node name="CharacterBody2D" node_paths=PackedStringArray("debugLabel") instance=ExtResource("1_vw1f8")]
+[node name="CharacterBody2D" instance=ExtResource("1_vw1f8")]
 script = ExtResource("2_ptiho")
 EnemyType = 1
 ShootRange = 50.0
 ShootInterval = 1.0
-debugLabel = NodePath("DebugText")
 moveSpeed = 80
 
 [node name="Sprite2D" parent="." index="2"]
@@ -16,16 +15,3 @@ modulate = Color(0.32711, 0.33614, 0.577174, 1)
 
 [node name="AnimatedSprite2D" parent="." index="3"]
 self_modulate = Color(0.73784, 0.5888, 0.92, 1)
-
-[node name="DebugText" type="RichTextLabel" parent="." index="5"]
-z_index = 1
-texture_filter = 1
-offset_left = -60.0
-offset_top = -32.0
-offset_right = 60.0
-offset_bottom = 8.0
-theme_override_font_sizes/normal_font_size = 12
-text = "DEbug"
-fit_content = true
-scroll_active = false
-horizontal_alignment = 1

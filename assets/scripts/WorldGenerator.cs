@@ -62,6 +62,8 @@ public partial class WorldGenerator : Node2D
 
     private int generatedRoomCount = 0;
 
+    [Export]
+    public int debugSeed = 0;
     public static int Seed;
 
     private TileSet tileSet;
@@ -106,6 +108,8 @@ public partial class WorldGenerator : Node2D
 
     public override void _Ready()
     {
+        if (debugSeed != 0)
+            Seed = debugSeed;
         base._Ready();
         if (walls == null || ground == null)
         {
@@ -149,6 +153,7 @@ public partial class WorldGenerator : Node2D
         walls.Clear();
         ground.Clear();
         generatedRoomCount = 0;
+        generatedRooms.Clear();
 
         GD.Print("Target: ", roomCount);
         generationQueue.Clear();
@@ -228,7 +233,8 @@ public partial class WorldGenerator : Node2D
         GD.Print($"[Time] SpawnPlayer: {sw.ElapsedMilliseconds} ms");
 
         sw.Restart();
-        SpawnEnemies();
+        if (debugSeed == 0)
+            SpawnEnemies();
         sw.Stop();
         GD.Print($"[Time] SpawnEnemies: {sw.ElapsedMilliseconds} ms");
         GD.Print("Done");
@@ -509,7 +515,7 @@ public partial class WorldGenerator : Node2D
                 {
                     var enemyScene = enemies[random.Next(enemies.Length)];
                     var enemy = enemyScene.Instantiate<Node2D>();
-                    enemy.Position = worldPos * walls.TileSet.TileSize + Position;
+                    enemy.Position = worldPos * walls.TileSet.TileSize + Vector2.Up * 6 + Position;
                     GetParent().CallDeferred("add_child", enemy);
                     enemyCount--;
                 }

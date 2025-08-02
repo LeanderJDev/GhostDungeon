@@ -1086,6 +1086,7 @@ texture = ExtResource("1_7oh2i")
 15:6/0/y_sort_origin = -4
 15:6/0/custom_data_1 = "openchest"
 14:7/0 = 0
+14:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 9:6/0 = 0
 9:6/0/modulate = Color(0.5, 0.5, 0.5, 1)
 9:6/0/y_sort_origin = -8

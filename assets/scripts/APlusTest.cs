@@ -74,6 +74,9 @@ public partial class APlusTest : Node2D
             targetMarker.GlobalPosition
         );
 
+        startMarker.GlobalPosition = currentResult.path[0];
+        targetMarker.GlobalPosition = currentResult.path[^1];
+
         // Visualisierung der Tiles auf dem TileMapLayer
         visulaiseLayer.Clear();
         visulaiseLayer.SetCell(Vector2I.Zero, 0, new Vector2I(0, 0));

@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://d2vu1m3udijn7"]
+
+[ext_resource type="PackedScene" uid="uid://kq6ll83uetxm" path="res://assets/scenes/enemy1.tscn" id="1_maeo0"]
+[ext_resource type="Script" uid="uid://bqiaby27027ax" path="res://assets/scripts/EnemyPathfindingTest.cs" id="1_wq1vm"]
+[ext_resource type="PackedScene" uid="uid://cb38sob6butyy" path="res://assets/scenes/world_generator.tscn" id="3_xv3yw"]
+[ext_resource type="TileSet" uid="uid://cvo5b5vv8rj5r" path="res://assets/art/tile_set.tres" id="4_0ujyl"]
+[ext_resource type="Script" uid="uid://72etv41p3aly" path="res://assets/scripts/CameraController.cs" id="4_wq1vm"]
+
+[node name="EnemyPathfindingTest" type="Node2D" node_paths=PackedStringArray("enemy", "visulaiseLayer")]
+script = ExtResource("1_wq1vm")
+enemy = NodePath("CharacterBody2D")
+visulaiseLayer = NodePath("WorldGenerator/room patterns/TileMapLayer")
+
+[node name="CharacterBody2D" parent="." instance=ExtResource("1_maeo0")]
+position = Vector2(32, 32)
+
+[node name="WorldGenerator" parent="." instance=ExtResource("3_xv3yw")]
+debugSeed = 3
+
+[node name="TileMapLayer" type="TileMapLayer" parent="WorldGenerator/room patterns" index="3"]
+z_index = 1
+position = Vector2(16000, 16000)
+scale = Vector2(1.00388, 1)
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0)
+tile_set = ExtResource("4_0ujyl")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("4_wq1vm")
+
+[editable path="WorldGenerator"]
+[editable path="WorldGenerator/room patterns"]

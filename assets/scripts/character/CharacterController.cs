@@ -184,7 +184,7 @@ public partial class CharacterController : CharacterBody2D
         Random rand = new(seed);
         List<Item> loot = new();
 
-        int itemCount = rand.Next(1, 3); // 1-2 items
+        int itemCount = rand.Next(1, 4); // 1-3 items
 
         // First two items are always keys (random color except white)
         KeyColor[] possibleKeyColors =
@@ -194,7 +194,7 @@ public partial class CharacterController : CharacterBody2D
             KeyColor.Green,
             KeyColor.Violet,
         };
-        for (int i = 0; i < Math.Min(1, itemCount); i++)
+        for (int i = 0; i < Math.Min(2, itemCount); i++)
         {
             KeyColor color = possibleKeyColors[rand.Next(possibleKeyColors.Length)];
             loot.Add(KeyItem.Instantiate(color));
