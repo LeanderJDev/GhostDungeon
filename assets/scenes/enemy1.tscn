@@ -10,5 +10,5 @@ ShootRange = 80.0
 ShootInterval = 1.0
 moveSpeed = 50
 
-[node name="AnimatedSprite2D" parent="sprite wrapper" index="0"]
-self_modulate = Color(1, 0.65, 0.65, 1)
+[node name="AnimatedShoes" parent="sprite wrapper" index="1"]
+process_mode = 4

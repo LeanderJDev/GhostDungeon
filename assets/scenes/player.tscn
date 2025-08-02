@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="2_14505"]
 [ext_resource type="AudioStream" uid="uid://cfpnjm4k10s31" path="res://assets/sfx/step.wav" id="4_0gfpk"]
 [ext_resource type="Texture2D" uid="uid://ccsh3n4twpwlt" path="res://assets/art/neutral_point_light.webp" id="4_4wcc8"]
+[ext_resource type="SpriteFrames" uid="uid://b31dcb01batjh" path="res://assets/art/player_sprite_frames.tres" id="5_8sknh"]
 [ext_resource type="AudioStream" uid="uid://bius0746cw130" path="res://assets/sfx/waterstep.wav" id="5_0hrit"]
 
 [node name="player" instance=ExtResource("1_4wcc8")]
@@ -23,10 +24,14 @@ shadow_enabled = true
 shadow_color = Color(0, 0, 0, 1)
 texture = ExtResource("4_4wcc8")
 
-[node name="AnimatedSprite2D" parent="sprite wrapper" index="0"]
-modulate = Color(1, 1, 1, 1)
+[node name="AnimatedBody" parent="sprite wrapper" index="0"]
+sprite_frames = ExtResource("5_8sknh")
 light_mask = 4
+modulate = Color(1, 1, 1, 1)
 animation = &"walk_down"
+
+[node name="AnimatedShoes" parent="sprite wrapper" index="1"]
+process_mode = 4
 
 [node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="." index="6"]
 process_mode = 3

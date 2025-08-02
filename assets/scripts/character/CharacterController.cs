@@ -19,6 +19,9 @@ public partial class CharacterController : CharacterBody2D
     public AnimatedSprite2D sprite;
 
     [Export]
+    public AnimatedSprite2D shoes;
+
+    [Export]
     public Node2D shootMarker;
 
     public bool isDead;
@@ -148,8 +151,12 @@ public partial class CharacterController : CharacterBody2D
             flipH = sprite.FlipH;
         }
         if (sprite.Animation != anim)
+        {
             sprite.Play(anim);
+            shoes.Play(anim);
+        }
         sprite.FlipH = flipH;
+        shoes.FlipH = flipH;
     }
 
     private IEnumerable<Vector2I> GetTilesInRadius(TileMapLayer tilemap, Vector2 center, int radius)
@@ -401,3 +408,4 @@ public partial class CharacterController : CharacterBody2D
         player.Play();
     }
 }
+//15 104 6
