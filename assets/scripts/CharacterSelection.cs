@@ -128,7 +128,6 @@ public partial class CharacterSelection : CharacterController
             animation = animation.Replace("_down", "_left");
             animation = animation.Replace("_up", "_right");
         }
-        GD.Print("Playing animation: " + animation);
         foreach (AnimatedSprite2D sprite in sprites)
         {
             sprite.Play(animation.Replace("_left", "_right"));

@@ -112,7 +112,6 @@ public partial class PlayerController : CharacterController
                     }
                 );
             }
-            GD.Print("checkfor chests");
             Vector2I? chestPosition = CheckForChests();
             if (chestPosition != null)
             {
@@ -125,7 +124,6 @@ public partial class PlayerController : CharacterController
                         direction = chestPosition.Value,
                     }
                 );
-                GD.Print("Emit signal");
                 EmitSignal(SignalName.upgradesChanged);
             }
         }

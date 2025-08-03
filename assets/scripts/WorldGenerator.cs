@@ -146,6 +146,7 @@ public partial class WorldGenerator : Node2D
             return;
         }
         random = Seed != 0 ? new Random(Seed) : new Random();
+        GD.Print($"Using seed: {Seed}");
         GD.Print($"Found {roomChoices.Length} room patterns in TileSet.");
         GD.Print("Starting world generation...");
         StartGeneration();
@@ -306,7 +307,7 @@ public partial class WorldGenerator : Node2D
                     possiblePositions[i]
                 );
             }
-            foreach (var pos in possiblePositions)
+            foreach (var pos in possiblePositions.Take(5)) // Slightly favor more walkable rooms
             {
                 if (CheckSpace(walls, ground, pos))
                     return (Vector2)walls.MapToLocal(pos);

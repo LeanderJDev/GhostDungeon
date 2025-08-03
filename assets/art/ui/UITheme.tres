@@ -26,5 +26,6 @@ LineEdit/styles/normal = ExtResource("3_jks2c")
 OptionButton/colors/font_pressed_color = Color(1, 1, 1, 1)
 OptionButton/styles/pressed = ExtResource("3_jks2c")
 Panel/styles/panel = ExtResource("1_a071u")
+PopupMenu/font_sizes/font_size = 24
 PopupMenu/styles/hover = ExtResource("2_th2g3")
 PopupMenu/styles/panel = ExtResource("3_jks2c")
