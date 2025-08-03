@@ -350,7 +350,6 @@ public partial class EnemyController : CharacterController
     {
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            GD.Print("Trying to generate wander path..."); // Debugging
             int x = wanderRng.Next(-maxWanderDistance, maxWanderDistance + 1);
             int y = wanderRng.Next(-maxWanderDistance, maxWanderDistance + 1);
             Vector2I candidateTarget =
@@ -373,6 +372,7 @@ public partial class EnemyController : CharacterController
                 return;
             }
         }
+        GD.PrintErr("Failed to generate wander path after " + maxAttempts + " attempts.");
         wanderPath = null;
         wanderTimer = wanderRng.Next(minWanderInterval, maxWanderInterval);
         moveDirection = Vector2.Zero;

@@ -30,6 +30,7 @@ public partial class PlayerController : CharacterController
     {
         positions = new List<Vector2>(),
         actions = new List<CharacterAction>(),
+        characterCustomisation = new CharacterCustomisation(),
     };
 
     private static PlayerController _instance;
@@ -170,6 +171,7 @@ public partial class PlayerController : CharacterController
         GD.Print("Dead");
         if (immortal != true)
         {
+            playerPath.characterCustomisation = characterPartSelection;
             YourRunRestartsHere.Instance.PlayerDead(playerPath);
         }
     }

@@ -2,26 +2,41 @@
 
 [ext_resource type="PackedScene" uid="uid://c553vedfj6kr" path="res://assets/scenes/character.tscn" id="1_rt4f0"]
 [ext_resource type="Script" uid="uid://bjoxinxbq8poi" path="res://assets/scripts/character/GhostController.cs" id="1_sopgx"]
-[ext_resource type="SpriteFrames" uid="uid://60x3m0grah08" path="res://assets/art/ghost_sprite_frames.tres" id="3_rt4f0"]
+[ext_resource type="SpriteFrames" uid="uid://60x3m0grah08" path="res://assets/art/sprite_frames/ghost_sprite_frames.tres" id="3_rt4f0"]
 
-[node name="ghost" node_paths=PackedStringArray("ghostSprite", "sprites") instance=ExtResource("1_rt4f0")]
+[node name="ghost" node_paths=PackedStringArray("ghostSprite") instance=ExtResource("1_rt4f0")]
 collision_layer = 16
 script = ExtResource("1_sopgx")
 ghostSprite = NodePath("sprite wrapper")
-sprites = []
 moveSpeed = 120
 
 [node name="AnimatedBody" parent="sprite wrapper" index="0"]
 sprite_frames = ExtResource("3_rt4f0")
 
-[node name="AnimatedShoes" parent="sprite wrapper" index="1"]
+[node name="AnimatedHair1" parent="sprite wrapper" index="1"]
 self_modulate = Color(1, 1, 1, 0.752941)
 
-[node name="AnimatedHair1" parent="sprite wrapper" index="2"]
+[node name="AnimatedHair2" parent="sprite wrapper" index="2"]
 self_modulate = Color(1, 1, 1, 0.752941)
 
-[node name="AnimatedHair2" parent="sprite wrapper" index="3"]
+[node name="AnimatedChest" parent="sprite wrapper" index="3"]
 self_modulate = Color(1, 1, 1, 0.752941)
+
+[node name="AnimatedSocks" parent="sprite wrapper" index="4"]
+self_modulate = Color(1, 1, 1, 0.752941)
+
+[node name="AnimatedTrousers" parent="sprite wrapper" index="5"]
+self_modulate = Color(1, 1, 1, 0.752941)
+
+[node name="AnimatedShoes" parent="sprite wrapper" index="6"]
+self_modulate = Color(1, 1, 1, 0.752941)
+
+[node name="itemContainer" parent="sprite wrapper" index="7"]
+visible = true
+
+[node name="Control" parent="sprite wrapper" index="8"]
+process_mode = 0
+visible = true
 
 [node name="hitbox" parent="." index="4"]
 collision_layer = 64

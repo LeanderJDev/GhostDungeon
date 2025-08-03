@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4p28v5duilfw"
-path="res://.godot/imported/MainCharacter_Shoes.png-ee2679845d9f6b099293c3e743d16655.ctex"
+uid="uid://dlswahicbkvri"
+path="res://.godot/imported/MainCharacter_Hair1.png-8c701c1688a355be994daa11bf97eb40.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/MainCharacter_Shoes.png"
-dest_files=["res://.godot/imported/MainCharacter_Shoes.png-ee2679845d9f6b099293c3e743d16655.ctex"]
+source_file="res://assets/art/sprite_frames/MainCharacter_Hair1.png"
+dest_files=["res://.godot/imported/MainCharacter_Hair1.png-8c701c1688a355be994daa11bf97eb40.ctex"]
 
 [params]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://c553vedfj6kr"]
+[gd_scene load_steps=18 format=3 uid="uid://c553vedfj6kr"]
 
 [ext_resource type="Script" uid="uid://d1na0i15r6eg2" path="res://assets/scripts/character/CharacterController.cs" id="1_0ggam"]
 [ext_resource type="PackedScene" uid="uid://c2vdvaj36c6so" path="res://assets/scenes/projectile.tscn" id="2_6po5b"]
@@ -7,10 +7,14 @@
 [ext_resource type="AudioStream" uid="uid://cmtrlxjq2h1c3" path="res://assets/sfx/keypickup.wav" id="5_ni0wq"]
 [ext_resource type="AudioStream" uid="uid://cswy2o4jhnpcq" path="res://assets/sfx/die.wav" id="6_k3wpx"]
 [ext_resource type="AudioStream" uid="uid://cq1sf8wj58ift" path="res://assets/sfx/shoot.wav" id="7_0yj1m"]
-[ext_resource type="SpriteFrames" uid="uid://duot78qyavvdu" path="res://assets/art/skeleton_sprite_frames.tres" id="8_ni0wq"]
-[ext_resource type="SpriteFrames" uid="uid://bsnea1hscvlmd" path="res://assets/art/shoes_sprite_frames.tres" id="9_k3wpx"]
-[ext_resource type="SpriteFrames" uid="uid://dncr2rb8x4n3g" path="res://assets/art/hair1_sprite_frames.tres" id="10_0yj1m"]
-[ext_resource type="SpriteFrames" uid="uid://btsjsg2dw304d" path="res://assets/art/hair2_sprite_frames.tres" id="11_gvc1m"]
+[ext_resource type="SpriteFrames" uid="uid://duot78qyavvdu" path="res://assets/art/sprite_frames/skeleton_sprite_frames.tres" id="8_ni0wq"]
+[ext_resource type="SpriteFrames" uid="uid://bsnea1hscvlmd" path="res://assets/art/sprite_frames/shoes_sprite_frames.tres" id="9_k3wpx"]
+[ext_resource type="SpriteFrames" uid="uid://dncr2rb8x4n3g" path="res://assets/art/sprite_frames/hair1_sprite_frames.tres" id="10_0yj1m"]
+[ext_resource type="SpriteFrames" uid="uid://btsjsg2dw304d" path="res://assets/art/sprite_frames/shirt_sprite_frames.tres" id="11_gvc1m"]
+[ext_resource type="SpriteFrames" uid="uid://jwiqw2yrkvfl" path="res://assets/art/sprite_frames/hair2_sprite_frames.tres" id="11_ni0wq"]
+[ext_resource type="SpriteFrames" uid="uid://b7djc7fv78ant" path="res://assets/art/sprite_frames/trousers_sprite_frames.tres" id="13_0yj1m"]
+[ext_resource type="SpriteFrames" uid="uid://dmuv5vv0wd5tu" path="res://assets/art/sprite_frames/socks_sprite_frames.tres" id="14_gvc1m"]
+[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/ui/UITheme.tres" id="15_nhqhs"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_sopgx"]
 radius = 6.0
@@ -19,15 +23,16 @@ radius = 6.0
 radius = 7.0
 height = 20.0
 
-[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprites", "shootMarker", "itemDisplayContainer", "audioPlayer")]
+[node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprites", "shootMarker", "itemDisplayContainer", "characterNameLabel", "audioPlayer")]
 z_index = 1
 y_sort_enabled = true
 collision_layer = 4
 script = ExtResource("1_0ggam")
 projectile = ExtResource("2_6po5b")
-sprites = [NodePath("sprite wrapper/AnimatedBody"), NodePath("sprite wrapper/AnimatedShoes"), NodePath("sprite wrapper/AnimatedHair1"), NodePath("sprite wrapper/AnimatedHair2")]
+sprites = [NodePath("sprite wrapper/AnimatedBody"), NodePath("sprite wrapper/AnimatedShoes"), NodePath("sprite wrapper/AnimatedHair1"), NodePath("sprite wrapper/AnimatedHair2"), NodePath("sprite wrapper/AnimatedChest"), NodePath("sprite wrapper/AnimatedTrousers"), NodePath("sprite wrapper/AnimatedSocks")]
 shootMarker = NodePath("shootMarker")
 itemDisplayContainer = NodePath("sprite wrapper/itemContainer")
+characterNameLabel = NodePath("sprite wrapper/Control/Label")
 doorOpenSound = ExtResource("3_mlskq")
 powerUpSound = ExtResource("4_mlskq")
 keyPickupSound = ExtResource("5_ni0wq")
@@ -41,6 +46,7 @@ shape = SubResource("CircleShape2D_sopgx")
 
 [node name="sprite wrapper" type="Node2D" parent="."]
 light_mask = 2
+texture_filter = 1
 
 [node name="AnimatedBody" type="AnimatedSprite2D" parent="sprite wrapper"]
 modulate = Color(0.6, 0.6, 0.6, 1)
@@ -51,38 +57,116 @@ sprite_frames = ExtResource("8_ni0wq")
 animation = &"idle_down"
 offset = Vector2(0, -16)
 
-[node name="AnimatedShoes" type="AnimatedSprite2D" parent="sprite wrapper"]
-visible = false
-modulate = Color(0.6, 0.6, 0.6, 1)
-y_sort_enabled = true
-texture_filter = 1
-position = Vector2(0, 12)
-sprite_frames = ExtResource("9_k3wpx")
-animation = &"shoot_right"
-offset = Vector2(0, -16)
-
 [node name="AnimatedHair1" type="AnimatedSprite2D" parent="sprite wrapper"]
+process_mode = 4
 visible = false
 modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
 sprite_frames = ExtResource("10_0yj1m")
-animation = &"walk_down"
+animation = &"idle_down"
 offset = Vector2(0, -16)
 
 [node name="AnimatedHair2" type="AnimatedSprite2D" parent="sprite wrapper"]
+process_mode = 4
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
+y_sort_enabled = true
+texture_filter = 1
+position = Vector2(0, 12)
+sprite_frames = ExtResource("11_ni0wq")
+animation = &"idle_down"
+offset = Vector2(0, -16)
+
+[node name="AnimatedChest" type="AnimatedSprite2D" parent="sprite wrapper"]
+process_mode = 4
 visible = false
 modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
 sprite_frames = ExtResource("11_gvc1m")
-animation = &"idle_right"
+animation = &"idle_down"
+offset = Vector2(0, -16)
+
+[node name="AnimatedSocks" type="AnimatedSprite2D" parent="sprite wrapper"]
+process_mode = 4
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
+y_sort_enabled = true
+texture_filter = 1
+position = Vector2(0, 12)
+sprite_frames = ExtResource("14_gvc1m")
+animation = &"idle_down"
+offset = Vector2(0, -16)
+
+[node name="AnimatedTrousers" type="AnimatedSprite2D" parent="sprite wrapper"]
+process_mode = 4
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
+y_sort_enabled = true
+texture_filter = 1
+position = Vector2(0, 12)
+sprite_frames = ExtResource("13_0yj1m")
+animation = &"idle_down"
+offset = Vector2(0, -16)
+
+[node name="AnimatedShoes" type="AnimatedSprite2D" parent="sprite wrapper"]
+process_mode = 4
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
+y_sort_enabled = true
+texture_filter = 1
+position = Vector2(0, 12)
+sprite_frames = ExtResource("9_k3wpx")
+animation = &"idle_down"
 offset = Vector2(0, -16)
 
 [node name="itemContainer" type="Node2D" parent="sprite wrapper"]
+process_mode = 4
+visible = false
 position = Vector2(0, -19)
+
+[node name="Control" type="Control" parent="sprite wrapper"]
+process_mode = 4
+visible = false
+z_index = 1
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -20.0
+offset_right = 36.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.2, 0.2)
+
+[node name="Label" type="Label" parent="sprite wrapper/Control"]
+modulate = Color(0.6, 0.6, 0.6, 1)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -48.0
+offset_top = -10.0
+offset_right = 48.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("15_nhqhs")
+theme_override_colors/font_color = Color(0.947199, 0.947199, 0.947199, 1)
+theme_override_font_sizes/font_size = 16
+text = "character"
+horizontal_alignment = 1
+vertical_alignment = 1
+max_lines_visible = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 process_mode = 3

@@ -6,7 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://cfpnjm4k10s31" path="res://assets/sfx/step.wav" id="4_0gfpk"]
 [ext_resource type="Texture2D" uid="uid://ccsh3n4twpwlt" path="res://assets/art/neutral_point_light.webp" id="4_4wcc8"]
 [ext_resource type="AudioStream" uid="uid://bius0746cw130" path="res://assets/sfx/waterstep.wav" id="5_0hrit"]
-[ext_resource type="SpriteFrames" uid="uid://b31dcb01batjh" path="res://assets/art/player_sprite_frames.tres" id="5_8sknh"]
+[ext_resource type="SpriteFrames" uid="uid://b31dcb01batjh" path="res://assets/art/sprite_frames/player_sprite_frames.tres" id="5_8sknh"]
 
 [node name="player" node_paths=PackedStringArray("stepPlayer") instance=ExtResource("1_4wcc8")]
 script = ExtResource("1_s027a")
@@ -30,15 +30,47 @@ modulate = Color(1, 1, 1, 1)
 light_mask = 4
 sprite_frames = ExtResource("5_8sknh")
 
-[node name="AnimatedShoes" parent="sprite wrapper" index="1"]
+[node name="AnimatedHair1" parent="sprite wrapper" index="1"]
+process_mode = 0
 modulate = Color(1, 1, 1, 1)
 light_mask = 4
 
-[node name="AnimatedHair1" parent="sprite wrapper" index="2"]
+[node name="AnimatedHair2" parent="sprite wrapper" index="2"]
+process_mode = 0
 modulate = Color(1, 1, 1, 1)
 light_mask = 4
 
-[node name="AnimatedHair2" parent="sprite wrapper" index="3"]
+[node name="AnimatedChest" parent="sprite wrapper" index="3"]
+process_mode = 0
+modulate = Color(1, 1, 1, 1)
+light_mask = 4
+
+[node name="AnimatedSocks" parent="sprite wrapper" index="4"]
+process_mode = 0
+modulate = Color(1, 1, 1, 1)
+light_mask = 4
+
+[node name="AnimatedTrousers" parent="sprite wrapper" index="5"]
+process_mode = 0
+modulate = Color(1, 1, 1, 1)
+light_mask = 4
+
+[node name="AnimatedShoes" parent="sprite wrapper" index="6"]
+process_mode = 0
+modulate = Color(1, 1, 1, 1)
+light_mask = 4
+
+[node name="itemContainer" parent="sprite wrapper" index="7"]
+process_mode = 0
+visible = true
+light_mask = 4
+position = Vector2(0, -24)
+
+[node name="Control" parent="sprite wrapper" index="8"]
+visible = true
+light_mask = 4
+
+[node name="Label" parent="sprite wrapper/Control" index="0"]
 modulate = Color(1, 1, 1, 1)
 light_mask = 4
 

@@ -20,6 +20,8 @@ public partial class GhostController : CharacterController
             return;
         }
         ghostPosition = Position;
+        characterPartSelection = ghostPath.characterCustomisation;
+        UpdateSprites();
         base._Ready();
     }
 

@@ -9,15 +9,3 @@ EnemyType = 0
 ShootRange = 80.0
 ShootInterval = 1.0
 moveSpeed = 50
-
-[node name="AnimatedShoes" parent="sprite wrapper" index="1"]
-process_mode = 4
-visible = false
-
-[node name="AnimatedHair1" parent="sprite wrapper" index="2"]
-process_mode = 4
-visible = false
-
-[node name="AnimatedHair2" parent="sprite wrapper" index="3"]
-process_mode = 4
-visible = false

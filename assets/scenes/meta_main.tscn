@@ -1,18 +1,22 @@
-[gd_scene load_steps=5 format=3 uid="uid://cketwg4mkdccm"]
+[gd_scene load_steps=6 format=3 uid="uid://cketwg4mkdccm"]
 
 [ext_resource type="Script" uid="uid://yns72vg2la71" path="res://assets/scripts/character/MetaMain.cs" id="1_w5kng"]
 [ext_resource type="PackedScene" uid="uid://de7qkn4pdxk57" path="res://assets/scenes/main.tscn" id="2_8fi1s"]
 [ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="3_l03wl"]
-[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/UITheme.tres" id="4_mqhqy"]
+[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/ui/UITheme.tres" id="4_mqhqy"]
+[ext_resource type="AudioStream" uid="uid://cyhkepjy3muwe" path="res://assets/sfx/select.wav" id="4_t6vam"]
 
-[node name="metaMain" type="Node2D" node_paths=PackedStringArray("mainMenu")]
+[node name="metaMain" type="Node2D" node_paths=PackedStringArray("mainMenu", "uiPlayer")]
 process_mode = 3
 script = ExtResource("1_w5kng")
 mainScene = ExtResource("2_8fi1s")
 ghostScene = ExtResource("3_l03wl")
 mainMenu = NodePath("CanvasLayer")
+selectSound = ExtResource("4_t6vam")
+uiPlayer = NodePath("AudioStreamPlayer")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 texture_filter = 1
@@ -33,15 +37,7 @@ anchor_bottom = 0.25
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Button" type="Button" parent="CanvasLayer/Control"]
-layout_mode = 1
-offset_left = 14.0
-offset_top = 70.0
-offset_right = 274.0
-offset_bottom = 130.0
-text = "Start Game"
-
-[node name="Label" type="Label" parent="CanvasLayer/Control"]
+[node name="Label" type="Label" parent="CanvasLayer/Control/PanelContainer"]
 layout_mode = 0
 offset_left = 17.0
 offset_top = 15.0
@@ -50,8 +46,9 @@ offset_bottom = 50.0
 theme_override_font_sizes/font_size = 28
 text = "Ghost Dungeon"
 
-[node name="Label" type="Label" parent="CanvasLayer/Control/Label"]
+[node name="Label" type="Label" parent="CanvasLayer/Control/PanelContainer/Label"]
 show_behind_parent = true
+layout_mode = 0
 offset_top = -2.0
 offset_right = 253.0
 offset_bottom = 33.0
@@ -59,4 +56,23 @@ theme_override_colors/font_color = Color(0.46, 0.295167, 0.23, 1)
 theme_override_font_sizes/font_size = 28
 text = "Ghost Dungeon"
 
-[connection signal="button_up" from="CanvasLayer/Control/Button" to="." method="OnMainMenuClick"]
+[node name="Start" type="Button" parent="CanvasLayer/Control/PanelContainer"]
+layout_mode = 1
+offset_left = 14.0
+offset_top = 50.0
+offset_right = 274.0
+offset_bottom = 95.0
+text = "Start Game"
+
+[node name="Quit" type="Button" parent="CanvasLayer/Control/PanelContainer"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 100.0
+offset_right = 274.0
+offset_bottom = 145.0
+text = "Quit Game"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[connection signal="pressed" from="CanvasLayer/Control/PanelContainer/Start" to="." method="OnMainMenuStart"]
+[connection signal="pressed" from="CanvasLayer/Control/PanelContainer/Quit" to="." method="OnMainMenuQuit"]

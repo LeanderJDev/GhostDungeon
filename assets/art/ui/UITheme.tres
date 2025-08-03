@@ -1,0 +1,30 @@
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://b8oodjpg5a6k1"]
+
+[ext_resource type="StyleBox" uid="uid://dcxgox47xmekw" path="res://assets/art/ui/dirt_button.tres" id="1_a071u"]
+[ext_resource type="StyleBox" uid="uid://bn1mpa8ufpuoj" path="res://assets/art/ui/water_button.tres" id="2_th2g3"]
+[ext_resource type="FontFile" uid="uid://bcgp7s1r0mq86" path="res://assets/nokia_cellphone/nokiafc22.ttf" id="3_6lyvx"]
+[ext_resource type="StyleBox" uid="uid://cuyhadag5sv6o" path="res://assets/art/ui/bridge_lineedit.tres" id="3_jks2c"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a071u"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jks2c"]
+
+[resource]
+default_font = ExtResource("3_6lyvx")
+default_font_size = 12
+Button/colors/font_color = Color(0.231373, 0.152941, 0.121569, 1)
+Button/colors/font_pressed_color = Color(0.2862, 0.40887, 0.54, 1)
+Button/styles/focus = SubResource("StyleBoxEmpty_a071u")
+Button/styles/hover = ExtResource("1_a071u")
+Button/styles/normal = ExtResource("1_a071u")
+Button/styles/pressed = ExtResource("2_th2g3")
+Label/colors/font_color = Color(0.231373, 0.152941, 0.121569, 1)
+LineEdit/colors/font_color = Color(0.920995, 0.920995, 0.920994, 1)
+LineEdit/colors/font_placeholder_color = Color(0.73, 0.6351, 0.5402, 0.717647)
+LineEdit/styles/focus = SubResource("StyleBoxEmpty_jks2c")
+LineEdit/styles/normal = ExtResource("3_jks2c")
+OptionButton/colors/font_pressed_color = Color(1, 1, 1, 1)
+OptionButton/styles/pressed = ExtResource("3_jks2c")
+Panel/styles/panel = ExtResource("1_a071u")
+PopupMenu/styles/hover = ExtResource("2_th2g3")
+PopupMenu/styles/panel = ExtResource("3_jks2c")

@@ -2,18 +2,15 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public partial class YourRunRestartsHere : Control
+public partial class YourRunWinsHere : Control
 {
-    public static YourRunRestartsHere Instance { get; private set; }
-
-    [Export]
-    public Label restartLabel;
-
-    [Export]
-    public Control closeButton;
+    public static YourRunWinsHere Instance { get; private set; }
 
     private CharacterPath ghostPath;
     private bool paused = false;
+
+    [Export]
+    public GpuParticles2D particles;
 
     public override void _Ready()
     {
@@ -24,7 +21,7 @@ public partial class YourRunRestartsHere : Control
 
     public override void _Process(double delta)
     {
-        if (Input.IsActionJustPressed("Pause") && ghostPath.positions == null)
+        if (Input.IsActionJustPressed("Pause") && paused == true)
         {
             GD.Print("Pause button pressed", paused ? " - Unpausing" : " - Pausing");
             ShowRestartScreen(!paused);
@@ -33,35 +30,33 @@ public partial class YourRunRestartsHere : Control
     }
 
     //vom Signal aufgerufen!
-    public void ButtonPressed()
+    private void ButtonPressed()
     {
-        MetaMain.Instance.PlaySelectSound();
-        GD.Print("restart");
-        PlayerController.Instance.Kill();
-        MetaMain.SetGhostPath(ghostPath);
-        MetaMain.Restart();
+        YourRunRestartsHere.Instance.ButtonPressed();
     }
 
     public void PlayerDead(CharacterPath playerPath)
     {
-        ghostPath = playerPath;
-        restartLabel.Text = $"You died.";
-        closeButton.Visible = false;
         ShowRestartScreen();
+        ghostPath = playerPath;
     }
 
     public void ShowRestartScreen(bool visible = true)
     {
-        if (paused && ghostPath.positions != null)
-            return;
         if (visible == paused)
             return; // No change in visibility
-        paused = visible;
         if (ghostPath.positions == null)
             MetaMain.Instance.PlaySelectSound();
+        paused = visible;
 
         var child = (Control)GetChild(0);
         GetTree().Paused = paused;
+
+        if (visible)
+        {
+            particles.Restart();
+            particles.Emitting = true;
+        }
 
         // Create a timer for the delay (e.g., 0.5 seconds)
         var timer = new Timer();
@@ -75,6 +70,7 @@ public partial class YourRunRestartsHere : Control
             var tween = CreateTween();
             child.Visible = visible;
             child.Modulate = new Color(1, 1, 1, 0);
+            child.MouseFilter = visible ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
             tween.TweenProperty(child, "modulate:a", 1.0f, 0.5f);
             tween.Finished += () =>
             {

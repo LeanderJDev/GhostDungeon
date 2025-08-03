@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://0j6c2f573wy6"]
+[gd_scene load_steps=5 format=3 uid="uid://0j6c2f573wy6"]
 
 [ext_resource type="Script" uid="uid://df2f7f3rqv80l" path="res://assets/scripts/character/YourRunRestartsHere.cs" id="1_gt22q"]
-[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/UITheme.tres" id="2_7a64d"]
+[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/ui/UITheme.tres" id="2_7a64d"]
+[ext_resource type="Texture2D" uid="uid://d1ud334y0lofn" path="res://assets/art/ui/cross2.png" id="3_iwxms"]
+[ext_resource type="Texture2D" uid="uid://un3cayftqths" path="res://assets/art/ui/cross1.png" id="4_7kvv7"]
 
-[node name="GameOverScreen" type="Control"]
+[node name="GameOverScreen" type="Control" node_paths=PackedStringArray("restartLabel", "closeButton")]
 texture_filter = 1
 layout_mode = 3
 anchors_preset = 15
@@ -12,21 +14,24 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_gt22q")
+restartLabel = NodePath("Panel/Label")
+closeButton = NodePath("Panel/TextureButton")
 
 [node name="Panel" type="Panel" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -256.0
-offset_top = -260.0
-offset_right = -140.0
-offset_bottom = -143.0
+offset_left = -231.0
+offset_top = -224.0
+offset_right = -115.0
+offset_bottom = -107.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(4.39234, 4.39234)
+scale = Vector2(4, 4)
 theme = ExtResource("2_7a64d")
 
 [node name="Label" type="Label" parent="Panel"]
@@ -41,7 +46,7 @@ offset_top = 0.300352
 offset_right = -5.53595
 offset_bottom = 23.3004
 theme = ExtResource("2_7a64d")
-text = "You got killed"
+text = "Paused"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -74,5 +79,17 @@ modulate = Color(0, 0, 0, 0.282353)
 show_behind_parent = true
 polygon = PackedVector2Array(116.567, 0, 122.031, 5.46406, 122.031, 122.031, 5.46406, 122.031, 0, 116.567, 114.745, 116.567, 114.745, 0)
 
+[node name="TextureButton" type="TextureButton" parent="Panel"]
+layout_mode = 0
+offset_left = 93.25
+offset_top = -5.5
+offset_right = 133.25
+offset_bottom = 34.5
+scale = Vector2(0.7, 0.7)
+texture_normal = ExtResource("3_iwxms")
+texture_pressed = ExtResource("4_7kvv7")
+stretch_mode = 3
+
 [connection signal="pressed" from="Panel/Button" to="." method="ButtonPressed"]
 [connection signal="pressed" from="Panel/Button2" to="." method="ButtonPressedGiveUp"]
+[connection signal="pressed" from="Panel/TextureButton" to="." method="ShowRestartScreen" binds= [false]]

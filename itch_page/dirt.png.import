@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bslq5tep0aags"
-path="res://.godot/imported/MainCharacter_Naked.png-c391d13a2c866eae1382b670caee6751.ctex"
+uid="uid://1enuc7fq8kr"
+path="res://.godot/imported/dirt.png-0761764c556380f16704f067384ac817.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/MainCharacter_Naked.png"
-dest_files=["res://.godot/imported/MainCharacter_Naked.png-c391d13a2c866eae1382b670caee6751.ctex"]
+source_file="res://itch_page/dirt.png"
+dest_files=["res://.godot/imported/dirt.png-0761764c556380f16704f067384ac817.ctex"]
 
 [params]
 

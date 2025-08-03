@@ -13,7 +13,13 @@ public partial class MetaMain : Node2D
     [Export]
     public CanvasLayer mainMenu;
 
-    private static MetaMain Instance;
+    [Export]
+    public AudioStreamWav selectSound;
+
+    [Export]
+    public AudioStreamPlayer uiPlayer;
+
+    public static MetaMain Instance;
 
     private static int respawnNextFrame = -1;
     private List<CharacterPath> ghostPaths = new();
@@ -30,7 +36,7 @@ public partial class MetaMain : Node2D
         base._Ready();
         mainMenu.Visible = true;
         mainMenu.SetProcess(true);
-        WorldGenerator.Seed = Time.GetDateStringFromSystem().GetHashCode();
+        WorldGenerator.Seed = Time.GetUnixTimeFromSystem().GetHashCode();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -53,8 +59,8 @@ public partial class MetaMain : Node2D
                 currentMainScene.AddChild(ghost);
                 GD.Print("Added Ghost");
             }
-            Instance.AddChild(currentMainScene);
             GetTree().Paused = false; // Unpause the game after respawn
+            Instance.AddChild(currentMainScene);
         }
         else if (respawnNextFrame > 0)
         {
@@ -90,10 +96,38 @@ public partial class MetaMain : Node2D
         Instance.currentMainScene = null;
     }
 
-    public void OnMainMenuClick()
+    public void OnMainMenuStart()
     {
+        PlaySelectSound();
         mainMenu.Visible = false;
         mainMenu.SetProcess(false);
         Restart();
+    }
+
+    public void OnMainMenuQuit()
+    {
+        PlaySelectSound();
+        GD.Print("Quitting game...");
+        while (uiPlayer.IsPlaying()) { } // Wait for sound to finish
+        GetTree().Quit();
+    }
+
+    public void PlaySelectSound()
+    {
+        if (uiPlayer != null && selectSound != null)
+        {
+            uiPlayer.Stream = selectSound;
+            uiPlayer.Play();
+        }
+        else
+        {
+            GD.PrintErr("UI Player or Select Sound not set in MetaMain.");
+        }
+    }
+
+    public void Win()
+    {
+        GD.Print("You win!");
+        YourRunWinsHere.Instance.ShowRestartScreen(true);
     }
 }

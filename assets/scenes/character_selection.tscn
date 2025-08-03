@@ -1,0 +1,280 @@
+[gd_scene load_steps=6 format=3 uid="uid://qwds33auo0yr"]
+
+[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/ui/UITheme.tres" id="1_k7sae"]
+[ext_resource type="PackedScene" uid="uid://d4bpnqcmrp5wd" path="res://assets/scenes/player.tscn" id="2_svfmr"]
+[ext_resource type="Script" uid="uid://p8ncq5il2ys1" path="res://assets/scripts/CharacterSelection.cs" id="3_w2a3r"]
+[ext_resource type="Texture2D" uid="uid://rkp0681r1vr1" path="res://assets/art/ui/arrow2.png" id="4_lsrrc"]
+[ext_resource type="Texture2D" uid="uid://c04ho565jovd7" path="res://assets/art/ui/arrow1.png" id="5_gfflm"]
+
+[node name="Character Selection" type="Control"]
+process_mode = 3
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -864.0
+offset_bottom = -486.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(4, 4)
+theme = ExtResource("1_k7sae")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Selection" type="Control" parent="Panel"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 60.0
+offset_top = 60.0
+offset_right = 100.0
+offset_bottom = 100.0
+
+[node name="player" parent="Panel/Selection" node_paths=PackedStringArray("characterSelectionContainer") instance=ExtResource("2_svfmr")]
+process_mode = 3
+position = Vector2(20, 20)
+scale = Vector2(5, 5)
+script = ExtResource("3_w2a3r")
+characterSelectionContainer = NodePath("../../..")
+
+[node name="CollisionShape2D" parent="Panel/Selection/player" index="0"]
+visible = false
+
+[node name="PointLight2D" parent="Panel/Selection/player" index="1"]
+visible = false
+
+[node name="sprite wrapper" parent="Panel/Selection/player" index="2"]
+texture_filter = 0
+
+[node name="Control" parent="Panel/Selection/player/sprite wrapper" index="8"]
+visible = false
+z_index = 0
+
+[node name="shootMarker" parent="Panel/Selection/player" index="4"]
+visible = false
+
+[node name="hitbox" parent="Panel/Selection/player" index="5"]
+visible = false
+
+[node name="Head Selection Group" type="Control" parent="Panel/Selection"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -50.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Left" type="TextureButton" parent="Panel/Selection/Head Selection Group"]
+layout_mode = 0
+offset_left = -60.0
+offset_top = -13.0
+offset_right = -33.0
+offset_bottom = 13.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+flip_h = true
+
+[node name="Right" type="TextureButton" parent="Panel/Selection/Head Selection Group"]
+layout_mode = 0
+offset_left = 33.0
+offset_top = -13.0
+offset_right = 60.0
+offset_bottom = 13.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+
+[node name="Chest Selection Group" type="Control" parent="Panel/Selection"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Left" type="TextureButton" parent="Panel/Selection/Chest Selection Group"]
+layout_mode = 0
+offset_left = -70.0
+offset_top = -12.0
+offset_right = -43.0
+offset_bottom = 14.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+flip_h = true
+
+[node name="Right" type="TextureButton" parent="Panel/Selection/Chest Selection Group"]
+layout_mode = 0
+offset_left = 43.0
+offset_top = -12.0
+offset_right = 70.0
+offset_bottom = 14.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+
+[node name="Pant Selection Group" type="Control" parent="Panel/Selection"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = 30.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Left" type="TextureButton" parent="Panel/Selection/Pant Selection Group"]
+layout_mode = 0
+offset_left = -70.0
+offset_top = -13.0
+offset_right = -43.0
+offset_bottom = 13.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+flip_h = true
+
+[node name="Right" type="TextureButton" parent="Panel/Selection/Pant Selection Group"]
+layout_mode = 0
+offset_left = 43.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = 13.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+
+[node name="Feet Selection Group" type="Control" parent="Panel/Selection"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = 55.0
+offset_bottom = 55.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Left" type="TextureButton" parent="Panel/Selection/Feet Selection Group"]
+layout_mode = 0
+offset_left = -55.0
+offset_top = -13.0
+offset_right = -28.0
+offset_bottom = 13.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+flip_h = true
+
+[node name="Right" type="TextureButton" parent="Panel/Selection/Feet Selection Group"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = -13.0
+offset_right = 55.0
+offset_bottom = 13.0
+texture_normal = ExtResource("4_lsrrc")
+texture_pressed = ExtResource("5_gfflm")
+stretch_mode = 0
+
+[node name="LineEdit" type="LineEdit" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 46.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 10
+placeholder_text = "Character Name"
+
+[node name="Animation" type="OptionButton" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_top = 50.0
+offset_right = -16.0
+offset_bottom = 77.0
+grow_horizontal = 0
+alignment = 1
+selected = 0
+allow_reselect = true
+item_count = 3
+popup/item_0/text = "Idle"
+popup/item_0/id = 0
+popup/item_1/text = "Walk"
+popup/item_1/id = 1
+popup/item_2/text = "Shoot"
+popup/item_2/id = 2
+
+[node name="Direction" type="OptionButton" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_top = 80.0
+offset_right = -16.0
+offset_bottom = 107.0
+grow_horizontal = 0
+alignment = 1
+selected = 0
+allow_reselect = true
+item_count = 4
+popup/item_0/text = "Down"
+popup/item_0/id = 1
+popup/item_1/text = "Up"
+popup/item_1/id = 0
+popup/item_2/text = "Left"
+popup/item_2/id = 2
+popup/item_3/text = "Right"
+popup/item_3/id = 3
+
+[node name="Done" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_top = 112.0
+offset_right = -16.0
+offset_bottom = 144.0
+grow_horizontal = 0
+text = "Done
+"
+
+[connection signal="pressed" from="Panel/Selection/Head Selection Group/Left" to="Panel/Selection/player" method="ChangeHead" binds= [-1]]
+[connection signal="pressed" from="Panel/Selection/Head Selection Group/Right" to="Panel/Selection/player" method="ChangeHead" binds= [1]]
+[connection signal="pressed" from="Panel/Selection/Chest Selection Group/Left" to="Panel/Selection/player" method="ChangeChest" binds= [-1]]
+[connection signal="pressed" from="Panel/Selection/Chest Selection Group/Right" to="Panel/Selection/player" method="ChangeChest" binds= [1]]
+[connection signal="pressed" from="Panel/Selection/Pant Selection Group/Left" to="Panel/Selection/player" method="ChangePants" binds= [-1]]
+[connection signal="pressed" from="Panel/Selection/Pant Selection Group/Right" to="Panel/Selection/player" method="ChangePants" binds= [1]]
+[connection signal="pressed" from="Panel/Selection/Feet Selection Group/Left" to="Panel/Selection/player" method="ChangeFeet" binds= [-1]]
+[connection signal="pressed" from="Panel/Selection/Feet Selection Group/Right" to="Panel/Selection/player" method="ChangeFeet" binds= [1]]
+[connection signal="text_changed" from="Panel/LineEdit" to="Panel/Selection/player" method="SetCharacterName"]
+[connection signal="item_selected" from="Panel/Animation" to="Panel/Selection/player" method="SetAnimation"]
+[connection signal="item_selected" from="Panel/Direction" to="Panel/Selection/player" method="SetDirection"]
+[connection signal="pressed" from="Panel/Done" to="Panel/Selection/player" method="FinishSelection"]
+
+[editable path="Panel/Selection/player"]

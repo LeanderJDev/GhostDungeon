@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://daq4chyyfsxmh"
-path="res://.godot/imported/player_prototype.png-88fa71c50d902bcd00e901d9313c3d01.ctex"
+uid="uid://dmcneqym1bix8"
+path="res://.godot/imported/MainCharacter_Shirt_adjusted.png-8f55402357d308ecd5adf220125a23b4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/player_prototype.png"
-dest_files=["res://.godot/imported/player_prototype.png-88fa71c50d902bcd00e901d9313c3d01.ctex"]
+source_file="res://assets/art/sprite_frames/MainCharacter_Shirt_adjusted.png"
+dest_files=["res://.godot/imported/MainCharacter_Shirt_adjusted.png-8f55402357d308ecd5adf220125a23b4.ctex"]
 
 [params]
 

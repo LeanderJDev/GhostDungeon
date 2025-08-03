@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0nan4ijw8odk"
-path="res://.godot/imported/MainCharacter_Hair2.png-00caa35297b441bfd3842c5bdb73a6ab.ctex"
+uid="uid://dxgx6viwwo77y"
+path="res://.godot/imported/skeleton.png-967bba346619394b06eb513164293307.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/MainCharacter_Hair2.png"
-dest_files=["res://.godot/imported/MainCharacter_Hair2.png-00caa35297b441bfd3842c5bdb73a6ab.ctex"]
+source_file="res://assets/art/sprite_frames/skeleton.png"
+dest_files=["res://.godot/imported/skeleton.png-967bba346619394b06eb513164293307.ctex"]
 
 [params]
 

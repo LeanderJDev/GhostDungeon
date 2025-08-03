@@ -1,0 +1,73 @@
+[gd_scene load_steps=9 format=3 uid="uid://d3ay416wgqbd4"]
+
+[ext_resource type="PackedScene" uid="uid://0j6c2f573wy6" path="res://assets/scenes/game_over_screen.tscn" id="1_b3jr6"]
+[ext_resource type="Script" uid="uid://dsftukugrny68" path="res://assets/scripts/YourRunWinsHere.cs" id="2_w12c8"]
+[ext_resource type="Texture2D" uid="uid://cl2sv5ptnmdhx" path="res://assets/art/particle.png" id="5_3levj"]
+
+[sub_resource type="Gradient" id="Gradient_5eic3"]
+offsets = PackedFloat32Array(0, 0.18541, 0.401216, 0.577508, 0.756839, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0.983333, 0, 1, 0.216667, 1, 0, 1, 0, 1, 0.983333, 1, 0.0666666, 0, 1, 1, 0.933333, 0, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2vgjb"]
+gradient = SubResource("Gradient_5eic3")
+
+[sub_resource type="Curve" id="Curve_xbevp"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.777102), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_40p5w"]
+curve = SubResource("Curve_xbevp")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8nal2"]
+lifetime_randomness = 0.15
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(575, 1, 1)
+angle_min = -25.0
+angle_max = 25.0
+direction = Vector3(0, 1, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 250.0
+angular_velocity_min = -15.0
+angular_velocity_max = 15.0
+gravity = Vector3(0, 98, 0)
+scale_min = 0.05
+scale_max = 0.2
+scale_over_velocity_min = 0.1
+scale_over_velocity_max = 0.1
+scale_over_velocity_curve = SubResource("CurveTexture_40p5w")
+color = Color(1, 1, 1, 0.847059)
+color_initial_ramp = SubResource("GradientTexture1D_2vgjb")
+turbulence_noise_strength = 0.1
+turbulence_noise_scale = 3.0
+
+[node name="WinScreen" node_paths=PackedStringArray("particles") instance=ExtResource("1_b3jr6")]
+script = ExtResource("2_w12c8")
+particles = NodePath("GPUParticles2D")
+
+[node name="Panel" parent="." index="0"]
+offset_left = -233.0
+offset_right = -117.0
+
+[node name="Label" parent="Panel" index="0"]
+offset_top = 3.479
+offset_right = -5.53601
+offset_bottom = 26.479
+theme_override_font_sizes/font_size = 16
+text = "You win!"
+
+[node name="Button2" parent="Panel" index="2"]
+text = "Quit"
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." index="1"]
+process_mode = 3
+z_index = 4
+position = Vector2(575, -1)
+emitting = false
+amount = 400
+texture = ExtResource("5_3levj")
+lifetime = 3.0
+one_shot = true
+speed_scale = 2.0
+randomness = 0.1
+process_material = SubResource("ParticleProcessMaterial_8nal2")

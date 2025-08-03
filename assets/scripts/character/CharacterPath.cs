@@ -5,6 +5,7 @@ public struct CharacterPath
 {
     public List<Vector2> positions;
     public List<CharacterAction> actions;
+    public CharacterCustomisation characterCustomisation;
 }
 
 public enum CharacterActionType

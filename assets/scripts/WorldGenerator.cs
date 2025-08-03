@@ -24,9 +24,10 @@ ToDo
 +Loop Manager
 
 ToDo Neu:
-Character Customization
++ Character Customization
 Win Screen
-Better UI
++ Better UI
+itch Page
 
 */
 
@@ -64,6 +65,7 @@ public partial class WorldGenerator : Node2D
 
     [Export]
     public Vector2I rockCoords = new Vector2I(0, 0);
+    private Vector2I winChestCoords = new Vector2I(16, 4);
 
     private int generatedRoomCount = 0;
 
@@ -361,7 +363,7 @@ public partial class WorldGenerator : Node2D
         GD.Print($"Treasure spawn at {treasureStart}");
         GD.Print($"Player room at {playerRoom}");
         GD.Print($"Player spawn at {playerPos}");
-        walls.SetCell((Vector2I)walls.LocalToMap(treasureStart), 0, new Vector2I(16, 0));
+        walls.SetCell(treasureRoom + roomSize / 2, 0, winChestCoords);
         // Optional: Hier könnte man ein Property setzen oder ein Objekt spawnen
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Godot;
 using Musikspieler.Scripts.RecordView;
 
@@ -25,6 +26,9 @@ public partial class CharacterController : CharacterBody2D
 
     [Export]
     public Node2D itemDisplayContainer;
+
+    [Export]
+    public Label characterNameLabel;
 
     public List<UpgradeItem> collectedUpgrades = [];
     public List<KeyItem> collectedKeys = [];
@@ -64,6 +68,14 @@ public partial class CharacterController : CharacterBody2D
     protected Vector2 moveDirection;
     private Vector2 moveAcceleration = Vector2.Zero;
     private float maxAcceleration = 10000;
+
+    public CharacterCustomisation characterPartSelection = new CharacterCustomisation(
+        "",
+        HairStyle.None,
+        ChestStyle.None,
+        PantStyle.None,
+        FeetStyle.None
+    );
 
     public override void _Ready()
     {
@@ -186,13 +198,36 @@ public partial class CharacterController : CharacterBody2D
                 OpenChest(pos);
                 return pos;
             }
+            if (data != null && (string)data.GetCustomData("tileDescription") == "winchest")
+            {
+                OpenWinChest(pos);
+                return null;
+            }
         }
         return null;
     }
 
-    protected void OpenChest(Vector2I? position = null)
+    private void OpenWinChest(Vector2I position)
     {
-        if (position != null)
+        MetaMain.Instance.Win();
+        Vector2I openWinchestAtlasPos = new(20, 1);
+        TileMapLayer tilemap = WorldGenerator.Instance.walls;
+        if (tilemap.GetCellAtlasCoords(position) == openWinchestAtlasPos)
+        {
+            return;
+        }
+        tilemap.SetCell(position, 0, openWinchestAtlasPos);
+        OpenChest(position, false);
+        OpenChest(position + new Vector2I(1, 0), false);
+        OpenChest(position + new Vector2I(-1, 0), false);
+        OpenChest(position + new Vector2I(0, -1), false);
+        OpenChest(position + new Vector2I(1, -1), false);
+        OpenChest(position + new Vector2I(-1, -1), false);
+    }
+
+    protected void OpenChest(Vector2I? position = null, bool placeOpenChest = true)
+    {
+        if (position != null && placeOpenChest)
         {
             Vector2I openchestAtlasPos = new(15, 6);
             TileMapLayer tilemap = WorldGenerator.Instance.walls;
@@ -267,8 +302,8 @@ public partial class CharacterController : CharacterBody2D
                     if (upgrade.upgradeType == UpgradeType.WalkOnWater)
                     {
                         item.Visible = false;
-                        sprites[1].Visible = true;
                         CollisionMask = 1 << 1;
+                        UpdateSprites();
                     }
                 }
                 AddItemToDisplay(item);
@@ -332,7 +367,7 @@ public partial class CharacterController : CharacterBody2D
         PlayShootAnimation(direction);
     }
 
-    private void ActuallyShoot(Vector2 direction)
+    protected void ActuallyShoot(Vector2 direction)
     {
         PlayAudio(shootSound);
         Projectile newProjectile = (Projectile)projectile.Instantiate();
@@ -342,9 +377,10 @@ public partial class CharacterController : CharacterBody2D
         newProjectile.hitGhosts = CanHitGhosts;
         newProjectile.SetShooter(this);
         GetParent().AddChild(newProjectile);
+        string anim = sprites[0].Animation.ToString().Replace("shoot_", "idle_");
         foreach (AnimatedSprite2D sprite in sprites)
         {
-            sprite.Animation = "idle_right";
+            sprite.Play(anim);
         }
     }
 
@@ -379,7 +415,8 @@ public partial class CharacterController : CharacterBody2D
         moveDirection = Vector2.Zero;
     }
 
-    const float keyDisplayWidth = 4;
+    const int keyDisplayWidth = 4;
+    const int upgradeDisplayWidth = 6;
 
     private void AddItemToDisplay(Item item)
     {
@@ -397,9 +434,16 @@ public partial class CharacterController : CharacterBody2D
         {
             collectedKeys[i].Position = new Vector2(i * keyDisplayWidth, 0);
         }
-        for (int i = 0; i < collectedUpgrades.Count; i++)
+        int upgradeOffset =
+            -(int)itemDisplayContainer.Position.X
+            - (collectedUpgrades.Count - 1) * upgradeDisplayWidth / 2;
+        // Only display upgrades that are not WalkOnWater
+        var displayUpgrades = collectedUpgrades
+            .Where(u => u.upgradeType != UpgradeType.WalkOnWater)
+            .ToList();
+        for (int i = 0; i < displayUpgrades.Count; i++)
         {
-            collectedUpgrades[i].Position = new Vector2(i * 6, 16);
+            displayUpgrades[i].Position = new Vector2(i * upgradeDisplayWidth + upgradeOffset, 24);
         }
     }
 
@@ -416,5 +460,87 @@ public partial class CharacterController : CharacterBody2D
         player.PitchScale = (float)GD.RandRange(0.95, 1.05);
         player.Play();
     }
+
+    public void UpdateSprites()
+    {
+        foreach (AnimatedSprite2D sprite in sprites)
+        {
+            sprite.Visible = false;
+        }
+
+        characterNameLabel.Text = characterPartSelection.Name;
+        sprites[0].Visible = true; // Always show the body
+
+        sprites[(int)characterPartSelection.Hair].Visible = true;
+        sprites[(int)characterPartSelection.Chest].Visible = true;
+        sprites[(int)characterPartSelection.Pants].Visible = true;
+        if (!CanWalkOnWater)
+            sprites[(int)characterPartSelection.Feet].Visible = true;
+        else
+            sprites[1].Visible = true;
+    }
 }
+
 //15 104 6
+
+// Sprites for hair, chest, pants and shoes
+// An enum would be good to keep track of the current selection
+public enum CharacterPart
+{
+    Hair,
+    Chest,
+    Pants,
+    Shoes,
+}
+
+// Each part can have multiple sprites, e.g. different hair styles, chest designs, etc
+// The selection can be stored in a list or dictionary, where the key is the CharacterPart
+// and the value is the index of the selected sprite for that part
+public enum HairStyle
+{
+    None = 0,
+    Dark = 2,
+    Clown = 3,
+}
+
+public enum ChestStyle
+{
+    None = 0,
+    Shirt = 4,
+}
+
+public enum PantStyle
+{
+    None = 0,
+    Shirt = 5,
+}
+
+public enum FeetStyle
+{
+    None = 0,
+    Socks = 6,
+}
+
+public struct CharacterCustomisation
+{
+    public string Name;
+    public HairStyle Hair;
+    public ChestStyle Chest;
+    public PantStyle Pants;
+    public FeetStyle Feet;
+
+    public CharacterCustomisation(
+        string name,
+        HairStyle hair,
+        ChestStyle chest,
+        PantStyle pants,
+        FeetStyle feet
+    )
+    {
+        Name = name;
+        Hair = hair;
+        Chest = chest;
+        Pants = pants;
+        Feet = feet;
+    }
+}
