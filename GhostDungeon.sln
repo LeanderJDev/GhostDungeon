@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhostDungeon", "GhostDungeon.csproj", "{6C089156-CA80-4433-B7A9-56DC70452FDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhostDungeon", "GhostDungeon.csproj", "{3898BB78-8551-4C99-B988-47FDA68099CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,11 +9,11 @@ Global
 	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6C089156-CA80-4433-B7A9-56DC70452FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C089156-CA80-4433-B7A9-56DC70452FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C089156-CA80-4433-B7A9-56DC70452FDB}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{6C089156-CA80-4433-B7A9-56DC70452FDB}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{6C089156-CA80-4433-B7A9-56DC70452FDB}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{6C089156-CA80-4433-B7A9-56DC70452FDB}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{3898BB78-8551-4C99-B988-47FDA68099CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3898BB78-8551-4C99-B988-47FDA68099CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3898BB78-8551-4C99-B988-47FDA68099CA}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{3898BB78-8551-4C99-B988-47FDA68099CA}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{3898BB78-8551-4C99-B988-47FDA68099CA}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{3898BB78-8551-4C99-B988-47FDA68099CA}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal
