@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cketwg4mkdccm"]
+[gd_scene load_steps=5 format=3 uid="uid://cketwg4mkdccm"]
 
 [ext_resource type="Script" uid="uid://yns72vg2la71" path="res://assets/scripts/character/MetaMain.cs" id="1_w5kng"]
 [ext_resource type="PackedScene" uid="uid://de7qkn4pdxk57" path="res://assets/scenes/main.tscn" id="2_8fi1s"]
 [ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="3_l03wl"]
+[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/UITheme.tres" id="4_mqhqy"]
 
 [node name="metaMain" type="Node2D" node_paths=PackedStringArray("mainMenu")]
 process_mode = 3
@@ -12,18 +13,50 @@ ghostScene = ExtResource("3_l03wl")
 mainMenu = NodePath("CanvasLayer")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-visible = false
 
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer"]
+[node name="Control" type="Control" parent="CanvasLayer"]
+texture_filter = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(4, 4)
+theme = ExtResource("4_mqhqy")
 
-[node name="Button" type="Button" parent="CanvasLayer"]
-offset_left = 440.0
-offset_top = 288.0
-offset_right = 728.0
-offset_bottom = 408.0
+[node name="PanelContainer" type="Panel" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.25
+anchor_bottom = 0.25
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="CanvasLayer/Control"]
+layout_mode = 1
+offset_left = 14.0
+offset_top = 70.0
+offset_right = 274.0
+offset_bottom = 130.0
 text = "Start Game"
 
-[connection signal="button_down" from="CanvasLayer/Button" to="." method="OnMainMenuClick"]
+[node name="Label" type="Label" parent="CanvasLayer/Control"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 15.0
+offset_right = 270.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 28
+text = "Ghost Dungeon"
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/Label"]
+show_behind_parent = true
+offset_top = -2.0
+offset_right = 253.0
+offset_bottom = 33.0
+theme_override_colors/font_color = Color(0.46, 0.295167, 0.23, 1)
+theme_override_font_sizes/font_size = 28
+text = "Ghost Dungeon"
+
+[connection signal="button_up" from="CanvasLayer/Control/Button" to="." method="OnMainMenuClick"]

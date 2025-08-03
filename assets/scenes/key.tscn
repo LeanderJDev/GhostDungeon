@@ -5,6 +5,7 @@
 
 [node name="Key" type="Node2D" node_paths=PackedStringArray("sprite")]
 y_sort_enabled = true
+scale = Vector2(0.5, 0.5)
 script = ExtResource("1_eqs4p")
 sprite = NodePath("Sprite2D")
 

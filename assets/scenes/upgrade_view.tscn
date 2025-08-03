@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=3 uid="uid://qehyrcsyu543"]
+
+[ext_resource type="Script" uid="uid://c535aagyaxplk" path="res://assets/scripts/UpgradeView.cs" id="1_75ghh"]
+[ext_resource type="Texture2D" uid="uid://kpuyfkwmyy1p" path="res://assets/art/hitGhosts.png" id="2_33i7c"]
+[ext_resource type="Texture2D" uid="uid://qvg8878j77to" path="res://assets/art/bouncyProjectiles.png" id="3_2afmg"]
+[ext_resource type="Texture2D" uid="uid://d1ievkapnc8gk" path="res://assets/art/walkOnWater.png" id="3_eflb2"]
+
+[node name="UpgradeView" type="Control" node_paths=PackedStringArray("walkOnWaterView", "hitGhostView", "bouncyProjectilesView")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_75ghh")
+walkOnWaterView = NodePath("water")
+hitGhostView = NodePath("ghost")
+bouncyProjectilesView = NodePath("bouncy")
+
+[node name="ghost" type="TextureRect" parent="."]
+visible = false
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -90.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 90.0
+grow_horizontal = 0
+texture = ExtResource("2_33i7c")
+
+[node name="water" type="TextureRect" parent="."]
+visible = false
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -90.0
+offset_top = 105.0
+offset_right = -10.0
+offset_bottom = 185.0
+grow_horizontal = 0
+texture = ExtResource("3_eflb2")
+
+[node name="bouncy" type="TextureRect" parent="."]
+visible = false
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -90.0
+offset_top = 200.0
+offset_right = -10.0
+offset_bottom = 280.0
+grow_horizontal = 0
+texture = ExtResource("3_2afmg")

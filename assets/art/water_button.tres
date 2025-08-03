@@ -1,0 +1,17 @@
+[gd_resource type="StyleBoxTexture" load_steps=2 format=3 uid="uid://bn1mpa8ufpuoj"]
+
+[ext_resource type="Texture2D" uid="uid://1fk05jfx0fb1" path="res://assets/art/tiles.png" id="1_ll3vh"]
+
+[resource]
+texture = ExtResource("1_ll3vh")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+region_rect = Rect2(12, 28, 24, 24)

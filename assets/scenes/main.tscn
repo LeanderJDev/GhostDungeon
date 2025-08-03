@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://de7qkn4pdxk57"]
+[gd_scene load_steps=5 format=3 uid="uid://de7qkn4pdxk57"]
 
 [ext_resource type="Script" uid="uid://72etv41p3aly" path="res://assets/scripts/CameraController.cs" id="2_dfgan"]
 [ext_resource type="PackedScene" uid="uid://cb38sob6butyy" path="res://assets/scenes/world_generator.tscn" id="3_dfgan"]
 [ext_resource type="PackedScene" uid="uid://0j6c2f573wy6" path="res://assets/scenes/game_over_screen.tscn" id="3_sfrgt"]
+[ext_resource type="PackedScene" uid="uid://qehyrcsyu543" path="res://assets/scenes/upgrade_view.tscn" id="4_sfrgt"]
 
 [node name="main" type="Node2D"]
 process_mode = 1
@@ -23,6 +24,8 @@ color = Color(0.190762, 0.190762, 0.190762, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 process_mode = 3
+
+[node name="UpgradeView" parent="CanvasLayer" instance=ExtResource("4_sfrgt")]
 
 [node name="GameOverScreen" parent="CanvasLayer" instance=ExtResource("3_sfrgt")]
 process_mode = 3

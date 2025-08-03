@@ -26,14 +26,21 @@ shadow_color = Color(0, 0, 0, 1)
 texture = ExtResource("4_4wcc8")
 
 [node name="AnimatedBody" parent="sprite wrapper" index="0"]
+modulate = Color(1, 1, 1, 1)
 light_mask = 4
 sprite_frames = ExtResource("5_8sknh")
 
 [node name="AnimatedShoes" parent="sprite wrapper" index="1"]
+modulate = Color(1, 1, 1, 1)
 light_mask = 4
 
 [node name="AnimatedHair1" parent="sprite wrapper" index="2"]
-visible = false
+modulate = Color(1, 1, 1, 1)
+light_mask = 4
+
+[node name="AnimatedHair2" parent="sprite wrapper" index="3"]
+modulate = Color(1, 1, 1, 1)
+light_mask = 4
 
 [node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="." index="6"]
 process_mode = 3

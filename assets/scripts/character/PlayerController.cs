@@ -37,6 +37,9 @@ public partial class PlayerController : CharacterController
 
     private Vector2 startPosition;
 
+    [Signal]
+    public delegate void upgradesChangedEventHandler();
+
     public override void _Ready()
     {
         _instance = this;
@@ -121,6 +124,8 @@ public partial class PlayerController : CharacterController
                         direction = chestPosition.Value,
                     }
                 );
+                GD.Print("Emit signal");
+                EmitSignal(SignalName.upgradesChanged);
             }
         }
 
@@ -136,6 +141,7 @@ public partial class PlayerController : CharacterController
                     direction = APlusPathfinder.Instance.GlobalToMap(GlobalPosition),
                 }
             );
+            EmitSignal(SignalName.upgradesChanged);
         }
 
         base._Process(delta);

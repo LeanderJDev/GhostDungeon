@@ -68,7 +68,6 @@ public partial class CharacterController : CharacterBody2D
     public override void _Ready()
     {
         base._Ready();
-        itemDisplayContainer.Position += new Vector2(itemDisplayWidth * 0.5f, 0);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -257,11 +256,9 @@ public partial class CharacterController : CharacterBody2D
         {
             if (item != null)
             {
-                AddChild(item);
                 if (item is KeyItem key)
                 {
                     collectedKeys.Add(key);
-                    AddItemToDisplay(key);
                 }
                 if (item is UpgradeItem upgrade)
                 {
@@ -269,9 +266,12 @@ public partial class CharacterController : CharacterBody2D
                     GD.Print($"equipped upgrade of type {upgrade.upgradeType}");
                     if (upgrade.upgradeType == UpgradeType.WalkOnWater)
                     {
+                        item.Visible = false;
+                        sprites[1].Visible = true;
                         CollisionMask = 1 << 1;
                     }
                 }
+                AddItemToDisplay(item);
             }
         }
     }
@@ -311,7 +311,7 @@ public partial class CharacterController : CharacterBody2D
         {
             GD.Print("door opened");
             collectedKeys.Remove(matchingKey);
-            ReleaseItemFromDisplay(matchingKey);
+            UpdateItemDisplay();
             matchingKey.QueueFree();
             bool isDoorVertical = tilemap.GetCellAtlasCoords(pos) == new Vector2I(0, 5);
             Vector2 dst = tilemap.MapToLocal(pos) - tilemap.ToLocal(Position);
@@ -379,27 +379,28 @@ public partial class CharacterController : CharacterBody2D
         moveDirection = Vector2.Zero;
     }
 
-    const float itemDisplayWidth = 4;
+    const float keyDisplayWidth = 4;
 
-    private void AddItemToDisplay(KeyItem item)
+    private void AddItemToDisplay(Item item)
     {
-        item.Reparent(itemDisplayContainer, false);
-        float posDelta = (collectedKeys.Count - 1) * itemDisplayWidth;
-        item.Position = new Vector2(posDelta, 0);
-        itemDisplayContainer.Position -= new Vector2(itemDisplayWidth * 0.5f, 0);
-        item.Scale = new Vector2(0.5f, 0.5f);
+        itemDisplayContainer.AddChild(item);
+        UpdateItemDisplay();
     }
 
-    private void ReleaseItemFromDisplay(KeyItem item)
+    private void UpdateItemDisplay()
     {
-        item.Reparent(GetViewport(), false);
-        item.GlobalPosition = GlobalPosition;
-        itemDisplayContainer.Position += new Vector2(itemDisplayWidth * 0.25f, 0);
+        itemDisplayContainer.Position = new Vector2(
+            -1 * (collectedKeys.Count - 1) * keyDisplayWidth / 2,
+            itemDisplayContainer.Position.Y
+        );
         for (int i = 0; i < collectedKeys.Count; i++)
         {
-            collectedKeys[i].Position = new Vector2(i * itemDisplayWidth, 0);
+            collectedKeys[i].Position = new Vector2(i * keyDisplayWidth, 0);
         }
-        item.Scale = new Vector2(1, 1);
+        for (int i = 0; i < collectedUpgrades.Count; i++)
+        {
+            collectedUpgrades[i].Position = new Vector2(i * 6, 16);
+        }
     }
 
     protected void PlayAudio(AudioStreamWav sound, AudioStreamPlayer2D player = null)

@@ -9,20 +9,25 @@ Gegner
 Items
 Traps
 
-Löcher füllen
++ Löcher füllen
 
 
 
 ToDo
++Main Menu
++OnWater Powerup
++Powerup Sprites
++Character Animations
+-Traps
++Door Sprite Fixes
+-Enemy Spawner
++Loop Manager
+
+ToDo Neu:
 Character Customization
-Main Menu
-OnWater Powerup
-Powerup Sprites
-Character Animations
-Traps
-Door Sprite Fixes
-Enemy Spawner
-Loop Manager
+Win Screen
+Better UI
+
 */
 
 public partial class WorldGenerator : Node2D

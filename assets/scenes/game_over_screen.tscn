@@ -1,22 +1,33 @@
-[gd_scene load_steps=2 format=3 uid="uid://0j6c2f573wy6"]
+[gd_scene load_steps=3 format=3 uid="uid://0j6c2f573wy6"]
 
 [ext_resource type="Script" uid="uid://df2f7f3rqv80l" path="res://assets/scripts/character/YourRunRestartsHere.cs" id="1_gt22q"]
+[ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/UITheme.tres" id="2_7a64d"]
 
 [node name="GameOverScreen" type="Control"]
 texture_filter = 1
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_gt22q")
-metadata/_edit_use_anchors_ = true
 
 [node name="Panel" type="Panel" parent="."]
-visible = false
-layout_mode = 0
-offset_left = 262.0
-offset_top = 7.0
-offset_right = 410.0
-offset_bottom = 115.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -256.0
+offset_top = -260.0
+offset_right = -140.0
+offset_bottom = -143.0
+grow_horizontal = 2
+grow_vertical = 2
 scale = Vector2(4.39234, 4.39234)
+theme = ExtResource("2_7a64d")
 
 [node name="Label" type="Label" parent="Panel"]
 layout_mode = 1
@@ -25,11 +36,14 @@ anchor_left = -0.00155935
 anchor_top = 0.013
 anchor_right = 1.0
 anchor_bottom = 0.013
-offset_left = 30.28
-offset_top = -0.0379884
-offset_right = -28.9477
-offset_bottom = 22.962
+offset_left = 5.64494
+offset_top = 0.300352
+offset_right = -5.53595
+offset_bottom = 23.3004
+theme = ExtResource("2_7a64d")
 text = "You got killed"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Button" type="Button" parent="Panel"]
 layout_mode = 1
@@ -37,11 +51,11 @@ anchors_preset = -1
 anchor_top = 0.0126483
 anchor_right = 1.0
 anchor_bottom = 0.0126483
-offset_left = 30.5077
-offset_top = 28.231
-offset_right = -50.4922
-offset_bottom = 59.231
-text = "Restart"
+offset_left = 15.0
+offset_top = 27.5201
+offset_right = -15.0
+offset_bottom = 58.5201
+text = "Respawn"
 
 [node name="Button2" type="Button" parent="Panel"]
 layout_mode = 1
@@ -49,11 +63,16 @@ anchors_preset = -1
 anchor_top = 0.0126483
 anchor_right = 1.0
 anchor_bottom = 0.0126483
-offset_left = 63.5197
-offset_top = 70.5774
-offset_right = -17.4802
-offset_bottom = 101.577
+offset_left = 15.0
+offset_top = 69.5201
+offset_right = -14.0
+offset_bottom = 100.52
 text = "Give up"
+
+[node name="Polygon2D" type="Polygon2D" parent="Panel"]
+modulate = Color(0, 0, 0, 0.282353)
+show_behind_parent = true
+polygon = PackedVector2Array(116.567, 0, 122.031, 5.46406, 122.031, 122.031, 5.46406, 122.031, 0, 116.567, 114.745, 116.567, 114.745, 0)
 
 [connection signal="pressed" from="Panel/Button" to="." method="ButtonPressed"]
 [connection signal="pressed" from="Panel/Button2" to="." method="ButtonPressedGiveUp"]

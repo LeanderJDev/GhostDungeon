@@ -43,7 +43,7 @@ shape = SubResource("CircleShape2D_sopgx")
 light_mask = 2
 
 [node name="AnimatedBody" type="AnimatedSprite2D" parent="sprite wrapper"]
-light_mask = 2
+modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
@@ -52,7 +52,8 @@ animation = &"idle_down"
 offset = Vector2(0, -16)
 
 [node name="AnimatedShoes" type="AnimatedSprite2D" parent="sprite wrapper"]
-light_mask = 2
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
@@ -61,7 +62,8 @@ animation = &"shoot_right"
 offset = Vector2(0, -16)
 
 [node name="AnimatedHair1" type="AnimatedSprite2D" parent="sprite wrapper"]
-light_mask = 2
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
@@ -70,7 +72,8 @@ animation = &"walk_down"
 offset = Vector2(0, -16)
 
 [node name="AnimatedHair2" type="AnimatedSprite2D" parent="sprite wrapper"]
-light_mask = 2
+visible = false
+modulate = Color(0.6, 0.6, 0.6, 1)
 y_sort_enabled = true
 texture_filter = 1
 position = Vector2(0, 12)
