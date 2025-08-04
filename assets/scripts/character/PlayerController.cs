@@ -112,19 +112,22 @@ public partial class PlayerController : CharacterController
                     }
                 );
             }
-            Vector2I? chestPosition = CheckForChests();
-            if (chestPosition != null)
+            else
             {
-                GD.Print("chest found");
-                playerPath.actions.Add(
-                    new CharacterAction
-                    {
-                        index = playerPath.positions.Count,
-                        action = CharacterActionType.ItemPickup,
-                        direction = chestPosition.Value,
-                    }
-                );
-                EmitSignal(SignalName.upgradesChanged);
+                Vector2I? chestPosition = CheckForChests();
+                if (chestPosition != null)
+                {
+                    GD.Print("chest found");
+                    playerPath.actions.Add(
+                        new CharacterAction
+                        {
+                            index = playerPath.positions.Count,
+                            action = CharacterActionType.ItemPickup,
+                            direction = chestPosition.Value,
+                        }
+                    );
+                    EmitSignal(SignalName.upgradesChanged);
+                }
             }
         }
 

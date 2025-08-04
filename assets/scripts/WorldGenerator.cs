@@ -25,9 +25,14 @@ ToDo
 
 ToDo Neu:
 + Character Customization
-Win Screen
++ Win Screen
 + Better UI
-itch Page
++ itch Page
+
+ToDo Post Jam:
++ Enemy Spawning deterministic
++ Hitbox immunity group specific
+
 
 */
 
@@ -77,7 +82,7 @@ public partial class WorldGenerator : Node2D
     private TileMapPattern[] roomChoices;
     private Queue<Vector2I> generationQueue = new();
     private List<Vector2I> generatedRooms = new();
-    private Random random = new();
+    private Random worldRandom = new();
 
     // Speichert das Spielerraum für Enemy-Spawn-Exklusion
     private Vector2I? playerRoomSaved = null;
@@ -88,6 +93,8 @@ public partial class WorldGenerator : Node2D
     [Export]
     public int enemySpawningRateVariance = 5; // seconds variance
     private double enemySpawnTimer = 20.0;
+    private int enemySpawnWave = 0;
+    private Random enemyRandom = new();
 
     public static readonly Vector2I[] neighbourDirections = new Vector2I[]
     {
@@ -145,7 +152,8 @@ public partial class WorldGenerator : Node2D
             GD.PrintErr("No room patterns found in TileSet.");
             return;
         }
-        random = Seed != 0 ? new Random(Seed) : new Random();
+        worldRandom = Seed != 0 ? new Random(Seed) : new Random();
+        enemyRandom = Seed != 0 ? new Random(Seed) : new Random();
         GD.Print($"Using seed: {Seed}");
         GD.Print($"Found {roomChoices.Length} room patterns in TileSet.");
         GD.Print("Starting world generation...");
@@ -157,11 +165,12 @@ public partial class WorldGenerator : Node2D
         enemySpawnTimer -= delta;
         if (enemySpawnTimer <= 0.0)
         {
-            enemySpawnTimer = random.Next(
+            enemySpawnWave++;
+            enemySpawnTimer = enemyRandom.Next(
                 enemySpawningRate - enemySpawningRateVariance,
                 enemySpawningRate + enemySpawningRateVariance
             );
-            SpawnEnemies(0, 2, (int)Time.GetTicksMsec());
+            SpawnEnemies(0, 2, enemySpawnWave);
         }
     }
 
@@ -301,7 +310,7 @@ public partial class WorldGenerator : Node2D
             // Fisher-Yates Shuffle für Effizienz
             for (int i = possiblePositions.Count - 1; i > 0; i--)
             {
-                int j = random.Next(i + 1);
+                int j = worldRandom.Next(i + 1);
                 (possiblePositions[i], possiblePositions[j]) = (
                     possiblePositions[j],
                     possiblePositions[i]
@@ -534,15 +543,15 @@ public partial class WorldGenerator : Node2D
             // Spielerraum überspringen
             if (playerRoomSaved != null && room == playerRoomSaved.Value && seed == 0)
                 continue;
-            Random enemyRandom = new Random(room.GetHashCode() + seed);
-            int enemyCount = enemyRandom.Next(minEnemyCount, maxEnemyCount + 1);
+            Random enemyRoomRandom = new Random(room.GetHashCode() + seed);
+            int enemyCount = enemyRoomRandom.Next(minEnemyCount, maxEnemyCount + 1);
             int maxEnemyTries = enemyCount * 3;
             int tries = 0;
             while (enemyCount > 0 && tries < maxEnemyTries)
             {
                 tries++;
-                int x = enemyRandom.Next(1, roomSize.X - 1);
-                int y = enemyRandom.Next(1, roomSize.Y - 1);
+                int x = enemyRoomRandom.Next(1, roomSize.X - 1);
+                int y = enemyRoomRandom.Next(1, roomSize.Y - 1);
                 Vector2I localPos = new Vector2I(x, y);
                 Vector2I worldPos = room + localPos;
                 if (!CheckSpace(walls, ground, worldPos))
@@ -561,7 +570,7 @@ public partial class WorldGenerator : Node2D
                 }
                 if (enemies.Length > 0)
                 {
-                    var enemyScene = enemies[enemyRandom.Next(enemies.Length)];
+                    var enemyScene = enemies[enemyRoomRandom.Next(enemies.Length)];
                     var enemy = enemyScene.Instantiate<Node2D>();
                     enemy.Position = worldPos * walls.TileSet.TileSize + Vector2.Up * 6 + Position;
                     GetParent().CallDeferred("add_child", enemy);
@@ -690,17 +699,17 @@ public partial class WorldGenerator : Node2D
     {
         if (ground.GetCellSourceId(position + Vector2I.One) != -1)
             return false;
-        int index = random.Next(roomChoices.Length / 2) * 2;
+        int index = worldRandom.Next(roomChoices.Length / 2) * 2;
         TileMapPattern wallChoice = roomChoices[index];
         TileMapPattern groundChoice = roomChoices[index + 1];
-        int rotation = random.Next(4);
+        int rotation = worldRandom.Next(4);
         TileMapPattern rotatedWallRoom = RotatePattern(wallChoice, rotation);
         TileMapPattern rotatedGroundRoom = RotatePattern(groundChoice, rotation);
         DrawRoom(position, rotatedWallRoom, rotatedGroundRoom);
 
         int neighbourCount = 0;
         int totalWeight = neighbourWeights.Sum();
-        int rand = random.Next(totalWeight);
+        int rand = worldRandom.Next(totalWeight);
         int cumulative = 0;
         for (int i = 0; i < neighbourWeights.Length; i++)
         {
@@ -712,7 +721,7 @@ public partial class WorldGenerator : Node2D
             }
         }
         List<Vector2I> directions = neighbourDirections
-            .OrderBy(x => random.Next())
+            .OrderBy(x => worldRandom.Next())
             .Take(neighbourCount)
             .ToList();
         foreach (Vector2I dir in directions)
