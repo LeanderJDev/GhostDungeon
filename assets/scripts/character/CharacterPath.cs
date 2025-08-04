@@ -1,10 +1,17 @@
 using System.Collections.Generic;
 using Godot;
 
-public struct CharacterPath
+public struct PlayerPath
 {
     public List<Vector2> positions;
-    public List<CharacterAction> actions;
+    public Dictionary<int, CharacterAction> actions;
+    public CharacterCustomisation characterCustomisation;
+}
+
+public struct GhostPath
+{
+    public Vector2[] positions;
+    public Dictionary<int, CharacterAction> actions;
     public CharacterCustomisation characterCustomisation;
 }
 
@@ -18,7 +25,6 @@ public enum CharacterActionType
 
 public struct CharacterAction
 {
-    public int index; //index of movement
     public CharacterActionType action;
     public Vector2 direction;
 }

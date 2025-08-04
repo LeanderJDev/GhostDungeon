@@ -6,7 +6,7 @@ public partial class YourRunWinsHere : Control
 {
     public static YourRunWinsHere Instance { get; private set; }
 
-    private CharacterPath ghostPath;
+    private PlayerPath ghostPath;
     private bool paused = false;
 
     [Export]
@@ -35,7 +35,7 @@ public partial class YourRunWinsHere : Control
         YourRunRestartsHere.Instance.ButtonPressed();
     }
 
-    public void PlayerDead(CharacterPath playerPath)
+    public void PlayerDead(PlayerPath playerPath)
     {
         ShowRestartScreen();
         ghostPath = playerPath;

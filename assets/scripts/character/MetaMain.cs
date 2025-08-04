@@ -22,7 +22,7 @@ public partial class MetaMain : Node2D
     public static MetaMain Instance;
 
     private static int respawnNextFrame = -1;
-    private List<CharacterPath> ghostPaths = new();
+    private List<PlayerPath> ghostPaths = new();
 
     private Node currentMainScene;
 
@@ -51,11 +51,16 @@ public partial class MetaMain : Node2D
             }
 
             currentMainScene = Instance.mainScene.Instantiate();
-            foreach (CharacterPath ghostPath in ghostPaths)
+            foreach (PlayerPath ghostPath in ghostPaths)
             {
                 GhostController ghost = (GhostController)ghostScene.Instantiate();
                 ghost.GlobalPosition = ghostPath.positions[0];
-                ghost.ghostPath = ghostPath;
+                ghost.ghostPath = new GhostPath
+                {
+                    positions = ghostPath.positions.ToArray(),
+                    actions = ghostPath.actions,
+                    characterCustomisation = ghostPath.characterCustomisation,
+                };
                 currentMainScene.AddChild(ghost);
                 GD.Print("Added Ghost");
             }
@@ -68,7 +73,7 @@ public partial class MetaMain : Node2D
         }
     }
 
-    public static void SetGhostPath(CharacterPath path)
+    public static void SetGhostPath(PlayerPath path)
     {
         Instance.ghostPaths.Add(path);
     }

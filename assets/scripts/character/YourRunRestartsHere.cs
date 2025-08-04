@@ -12,7 +12,7 @@ public partial class YourRunRestartsHere : Control
     [Export]
     public Control closeButton;
 
-    private CharacterPath ghostPath;
+    private PlayerPath ghostPath;
     private bool paused = false;
 
     public override void _Ready()
@@ -42,7 +42,7 @@ public partial class YourRunRestartsHere : Control
         MetaMain.Restart();
     }
 
-    public void PlayerDead(CharacterPath playerPath)
+    public void PlayerDead(PlayerPath playerPath)
     {
         ghostPath = playerPath;
         restartLabel.Text = $"You died.";

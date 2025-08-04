@@ -26,10 +26,10 @@ public partial class PlayerController : CharacterController
     [Export]
     public AudioStreamPlayer2D stepPlayer;
 
-    public CharacterPath playerPath = new CharacterPath
+    public PlayerPath playerPath = new PlayerPath
     {
         positions = new List<Vector2>(),
-        actions = new List<CharacterAction>(),
+        actions = new Dictionary<int, CharacterAction>(),
         characterCustomisation = new CharacterCustomisation(),
     };
 
@@ -69,9 +69,9 @@ public partial class PlayerController : CharacterController
             Vector2 shootDirection = (mouseGlobalPos - GlobalPosition).Normalized();
             Shoot(shootDirection);
             playerPath.actions.Add(
+                playerPath.positions.Count,
                 new CharacterAction
                 {
-                    index = playerPath.positions.Count,
                     action = CharacterActionType.Shoot,
                     direction = shootDirection,
                 }
@@ -104,9 +104,9 @@ public partial class PlayerController : CharacterController
             {
                 GD.Print("opened door");
                 playerPath.actions.Add(
+                    playerPath.positions.Count,
                     new CharacterAction
                     {
-                        index = playerPath.positions.Count,
                         action = CharacterActionType.DoorOpen,
                         direction = doorPosition.Value,
                     }
@@ -119,9 +119,9 @@ public partial class PlayerController : CharacterController
                 {
                     GD.Print("chest found");
                     playerPath.actions.Add(
+                        playerPath.positions.Count,
                         new CharacterAction
                         {
-                            index = playerPath.positions.Count,
                             action = CharacterActionType.ItemPickup,
                             direction = chestPosition.Value,
                         }
@@ -136,9 +136,9 @@ public partial class PlayerController : CharacterController
             //testing hsdjkfakd
             OpenChest(APlusPathfinder.Instance.GlobalToMap(GlobalPosition));
             playerPath.actions.Add(
+                playerPath.positions.Count,
                 new CharacterAction
                 {
-                    index = playerPath.positions.Count,
                     action = CharacterActionType.AntiSoftlock,
                     direction = APlusPathfinder.Instance.GlobalToMap(GlobalPosition),
                 }
