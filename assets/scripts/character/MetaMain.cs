@@ -78,6 +78,13 @@ public partial class MetaMain : Node2D
         Instance.ghostPaths.Add(path);
     }
 
+    public static CharacterCustomisation GetLastOutfit()
+    {
+        return Instance.ghostPaths.Count > 0
+            ? Instance.ghostPaths[^1].characterCustomisation
+            : new CharacterCustomisation();
+    }
+
     public static void Restart()
     {
         Instance.currentMainScene?.QueueFree();

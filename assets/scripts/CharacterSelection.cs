@@ -27,6 +27,8 @@ public partial class CharacterSelection : CharacterController
     public override void _Ready()
     {
         GetTree().Paused = true; // Pause the game during character selection
+        characterPartSelection = MetaMain.GetLastOutfit();
+        UpdateSprites();
     }
 
     public override void _PhysicsProcess(double delta)
