@@ -101,7 +101,7 @@ public partial class MetaMain : Node2D
 
     public void _GiveUp()
     {
-        GD.PrintErr("gave up");
+        GD.Print("gave up");
         WorldGenerator.Seed = Time.GetDatetimeStringFromSystem().GetHashCode();
         mainMenu.Visible = true;
         mainMenu.SetProcess(true);

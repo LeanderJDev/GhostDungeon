@@ -311,7 +311,7 @@ public partial class CharacterController : CharacterBody2D
     {
         PlayAudio(shootSound);
         Projectile newProjectile = (Projectile)projectile.Instantiate();
-        newProjectile.Position = shootMarker.GlobalPosition + direction.Normalized() * 4;
+        newProjectile.Position = shootMarker.GlobalPosition + direction.Normalized() * 10;
         newProjectile.direction = direction;
         newProjectile.maxBounce = maxProjectileBounces;
         newProjectile.hitGhosts = HasUpgrade(UpgradeType.GhostShoot);
