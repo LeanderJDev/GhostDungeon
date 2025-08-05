@@ -8,13 +8,15 @@
 [ext_resource type="AudioStream" uid="uid://bius0746cw130" path="res://assets/sfx/waterstep.wav" id="5_0hrit"]
 [ext_resource type="SpriteFrames" uid="uid://b31dcb01batjh" path="res://assets/art/sprite_frames/player_sprite_frames.tres" id="5_8sknh"]
 
-[node name="player" node_paths=PackedStringArray("stepPlayer") instance=ExtResource("1_4wcc8")]
+[node name="player" node_paths=PackedStringArray("stepPlayer", "feet") instance=ExtResource("1_4wcc8")]
+collision_layer = 8
 script = ExtResource("1_s027a")
 ghost = ExtResource("2_14505")
 immortal = false
 stepSound = ExtResource("4_0gfpk")
 waterStepSound = ExtResource("5_0hrit")
-stepPlayer = NodePath("AudioStreamPlayer2D2")
+stepPlayer = NodePath("stepPlayer")
+feet = NodePath("FeetMarker")
 moveSpeed = 100
 
 [node name="PointLight2D" type="PointLight2D" parent="." index="1"]
@@ -74,5 +76,16 @@ light_mask = 4
 modulate = Color(1, 1, 1, 1)
 light_mask = 4
 
-[node name="AudioStreamPlayer2D2" type="AudioStreamPlayer2D" parent="." index="6"]
+[node name="hitbox" parent="." index="5"]
+collision_layer = 8
+
+[node name="stepPlayer" type="AudioStreamPlayer2D" parent="." index="6"]
 process_mode = 3
+volume_db = -6.0
+
+[node name="AudioListener2D" type="AudioListener2D" parent="." index="7"]
+position = Vector2(0, -6)
+current = true
+
+[node name="FeetMarker" type="Marker2D" parent="." index="8"]
+position = Vector2(0, 12)

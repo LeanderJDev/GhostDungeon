@@ -34,6 +34,10 @@ public partial class APlusPathfinder : Node2D
 
         if (!IsTileWalkable(start, ignoreDoors) || !IsTileWalkable(target, ignoreDoors))
         {
+            if (IsTileWalkable(start, ignoreDoors))
+                GD.Print($"target Tile not walkable");
+            else
+                GD.PrintErr($"start Tile not walkable");
             return new List<Vector2>();
         }
 

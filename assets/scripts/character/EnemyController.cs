@@ -44,7 +44,7 @@ public partial class EnemyController : CharacterController
 
     // Für Nahkampfangriff
     private float meleeTimer = 0f;
-    private const float MeleeRange = 24f;
+    private const float MeleeRange = 16f;
     private const float MeleeTime = 0.5f;
 
     // Timeout für das Hängenbleiben an einem Pfadpunkt
@@ -259,17 +259,18 @@ public partial class EnemyController : CharacterController
             shootMarker.GlobalPosition,
             target
         );
-        query.CollisionMask = (1 << 1) | (1 << 2);
+        query.CollisionMask = (uint)PhysicsLayer.Player | (uint)PhysicsLayer.World;
         query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
         Godot.Collections.Dictionary result = space.IntersectRay(query);
         if (result.Count == 0)
             return false;
-        if (result.TryGetValue("collider", out Variant collider))
-        {
-            Node colliderNode = ((Godot.Variant)collider).As<Node>();
-            if (colliderNode != null && colliderNode.GetInstanceId() == player.GetInstanceId())
-                return true;
-        }
+        Variant colliderVariant = result["collider"];
+        object colliderObj = colliderVariant.Obj;
+        if (
+            colliderObj is PhysicsBody2D collider
+            && (collider.CollisionLayer & (uint)PhysicsLayer.Player) != 0
+        )
+            return true;
         return false;
     }
 

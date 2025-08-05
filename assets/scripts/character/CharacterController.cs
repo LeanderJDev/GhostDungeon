@@ -172,49 +172,14 @@ public partial class CharacterController : CharacterBody2D
         }
     }
 
-    private IEnumerable<Vector2I> GetTilesInRadius(TileMapLayer tilemap, Vector2 center, int radius)
-    {
-        Vector2I centerTile = tilemap.LocalToMap(center);
-        for (int x = -radius; x <= radius; x++)
-        {
-            for (int y = -radius; y <= radius; y++)
-            {
-                Vector2I pos = centerTile + new Vector2I(x, y);
-                yield return pos;
-            }
-        }
-    }
-
-    protected Vector2I? CheckForChests(int radius = 1)
-    {
-        TileMapLayer tilemap = WorldGenerator.Instance.walls;
-        Vector2 localPos = tilemap.ToLocal(Position);
-
-        foreach (Vector2I pos in GetTilesInRadius(tilemap, localPos, radius))
-        {
-            TileData data = tilemap.GetCellTileData(pos);
-            if (data != null && (string)data.GetCustomData("tileDescription") == "chest")
-            {
-                OpenChest(pos);
-                return pos;
-            }
-            if (data != null && (string)data.GetCustomData("tileDescription") == "winchest")
-            {
-                OpenWinChest(pos);
-                return null;
-            }
-        }
-        return null;
-    }
-
-    private void OpenWinChest(Vector2I position)
+    protected bool OpenWinChest(Vector2I position)
     {
         MetaMain.Instance.Win();
         Vector2I openWinchestAtlasPos = new(20, 1);
         TileMapLayer tilemap = WorldGenerator.Instance.walls;
         if (tilemap.GetCellAtlasCoords(position) == openWinchestAtlasPos)
         {
-            return;
+            return false;
         }
         tilemap.SetCell(position, 0, openWinchestAtlasPos);
         OpenChest(position, false);
@@ -223,9 +188,10 @@ public partial class CharacterController : CharacterBody2D
         OpenChest(position + new Vector2I(0, -1), false);
         OpenChest(position + new Vector2I(1, -1), false);
         OpenChest(position + new Vector2I(-1, -1), false);
+        return true;
     }
 
-    protected void OpenChest(Vector2I? position = null, bool placeOpenChest = true)
+    protected bool OpenChest(Vector2I? position = null, bool placeOpenChest = true)
     {
         if (position != null && placeOpenChest)
         {
@@ -233,7 +199,7 @@ public partial class CharacterController : CharacterBody2D
             TileMapLayer tilemap = WorldGenerator.Instance.walls;
             if (tilemap.GetCellAtlasCoords(position.Value) == openchestAtlasPos)
             {
-                return;
+                return false;
             }
             tilemap.SetCell(position.Value, 0, openchestAtlasPos);
         }
@@ -302,42 +268,21 @@ public partial class CharacterController : CharacterBody2D
                     if (upgrade.upgradeType == UpgradeType.WalkOnWater)
                     {
                         item.Visible = false;
-                        CollisionMask = 1 << 1;
+                        CollisionMask &= ~(uint)PhysicsLayer.Water;
                         UpdateSprites();
                     }
                 }
                 AddItemToDisplay(item);
             }
         }
+        return true;
     }
 
-    protected Vector2I? CheckAndUseDoors(int radius = 1)
-    {
-        TileMapLayer tilemap = WorldGenerator.Instance.walls;
-        Vector2 localPos = tilemap.ToLocal(Position);
-
-        foreach (Vector2I pos in GetTilesInRadius(tilemap, localPos, radius))
-        {
-            TileData data = tilemap.GetCellTileData(pos);
-            if (data != null && (string)data.GetCustomData("tileDescription") == "door")
-            {
-                GD.Print("door found");
-                if (OpenDoor(pos))
-                {
-                    return pos;
-                }
-            }
-        }
-        return null;
-    }
-
-    protected bool OpenDoor(Vector2I? position = null)
+    protected bool OpenDoor(Vector2I position)
     {
         PlayAudio(doorOpenSound);
         TileMapLayer tilemap = WorldGenerator.Instance.walls;
-        if (position == null)
-            return false;
-        Vector2I pos = position.Value;
+        Vector2I pos = position;
         int color = tilemap.GetCellSourceId(pos);
         GD.Print("color:");
         GD.Print(color);

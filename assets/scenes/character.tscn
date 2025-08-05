@@ -26,7 +26,8 @@ height = 20.0
 [node name="character" type="CharacterBody2D" node_paths=PackedStringArray("sprites", "shootMarker", "itemDisplayContainer", "characterNameLabel", "audioPlayer")]
 z_index = 1
 y_sort_enabled = true
-collision_layer = 4
+collision_layer = 32
+collision_mask = 3
 script = ExtResource("1_0ggam")
 projectile = ExtResource("2_6po5b")
 sprites = [NodePath("sprite wrapper/AnimatedBody"), NodePath("sprite wrapper/AnimatedShoes"), NodePath("sprite wrapper/AnimatedHair1"), NodePath("sprite wrapper/AnimatedHair2"), NodePath("sprite wrapper/AnimatedChest"), NodePath("sprite wrapper/AnimatedTrousers"), NodePath("sprite wrapper/AnimatedSocks")]
@@ -177,7 +178,7 @@ position = Vector2(0, 6)
 [node name="hitbox" type="StaticBody2D" parent="."]
 position = Vector2(0, 6)
 collision_layer = 32
-collision_mask = 32
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
 shape = SubResource("CapsuleShape2D_mlskq")

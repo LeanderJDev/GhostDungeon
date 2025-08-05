@@ -14,37 +14,35 @@ public partial class Projectile : CharacterBody2D
         set
         {
             if (value)
-                CollisionMask |= (1 << 4) | (1 << 6);
+                CollisionMask |= (uint)PhysicsLayer.Ghost;
             _hitGhosts = value;
         }
     }
 
-    private Node2D _shooter;
-    private double _shooterImmunityTime = 0.1; // 50ms
-    private double _timeSinceShot = 0.0;
+    private uint shooterLayer;
+    private double shooterImmunityTime = 0.1; // 50ms
+    private double timeSinceShot = 0.0;
 
-    public void SetShooter(Node2D shooter)
+    public void SetShooter(PhysicsBody2D shooter)
     {
-        _shooter = shooter;
-        _timeSinceShot = 0.0;
+        timeSinceShot = 0.0;
+        shooterLayer = shooter.CollisionLayer;
+        CollisionMask &= ~shooterLayer;
     }
 
     public override void _Ready()
     {
-        CollisionMask &= ~(1u << 5); // remove hitboxes
-        CollisionMask &= ~(1u << 2); // remove entities
         base._Ready();
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        _timeSinceShot += delta;
+        timeSinceShot += delta;
         Velocity = direction * speed * (float)delta;
         KinematicCollision2D collisionInfo = MoveAndCollide(Velocity);
-        if (_timeSinceShot >= _shooterImmunityTime)
+        if (timeSinceShot >= shooterImmunityTime)
         {
-            CollisionMask |= 1 << 5; // hitboxes
-            CollisionMask |= 1 << 2; // entities
+            CollisionMask |= shooterLayer;
         }
 
         if (collisionInfo != null)
@@ -56,17 +54,6 @@ public partial class Projectile : CharacterBody2D
             }
             if (body is CharacterController characterController)
             {
-                // Immunität gegen Schützen für 200ms
-                if (
-                    _shooter != null
-                    && IsInstanceValid(_shooter)
-                    && characterController.GetInstanceId() == _shooter.GetInstanceId()
-                    && _timeSinceShot < _shooterImmunityTime
-                )
-                {
-                    GD.Print("Projectile hit its own shooter, ignoring.");
-                    return;
-                }
                 if (!hitGhosts && characterController is GhostController)
                     return;
                 characterController.Kill();

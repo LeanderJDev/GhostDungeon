@@ -26,6 +26,9 @@ public partial class PlayerController : CharacterController
     [Export]
     public AudioStreamPlayer2D stepPlayer;
 
+    [Export]
+    public Marker2D feet;
+
     public PlayerPath playerPath = new PlayerPath
     {
         positions = new List<Vector2>(),
@@ -99,7 +102,7 @@ public partial class PlayerController : CharacterController
 
         if (Input.IsActionJustPressed("Interact"))
         {
-            Vector2I? doorPosition = CheckAndUseDoors();
+            Vector2I? doorPosition = CheckAndDoInteraction("door", OpenDoor);
             if (doorPosition != null)
             {
                 GD.Print("opened door");
@@ -114,7 +117,11 @@ public partial class PlayerController : CharacterController
             }
             else
             {
-                Vector2I? chestPosition = CheckForChests();
+                Vector2I? chestPosition = CheckAndDoInteraction("winchest", OpenWinChest, 2);
+                if (chestPosition == null)
+                {
+                    chestPosition = CheckAndDoInteraction("chest", pos => OpenChest(pos));
+                }
                 if (chestPosition != null)
                 {
                     GD.Print("chest found");
@@ -149,13 +156,63 @@ public partial class PlayerController : CharacterController
         base._Process(delta);
     }
 
+    private IEnumerable<Vector2I> GetTilesInRadius(TileMapLayer tilemap, Vector2 center, int radius)
+    {
+        Vector2I centerTile = tilemap.LocalToMap(center);
+        for (int x = -radius; x <= radius; x++)
+        {
+            for (int y = -radius; y <= radius; y++)
+            {
+                Vector2I pos = centerTile + new Vector2I(x, y);
+                yield return pos;
+            }
+        }
+    }
+
+    private Vector2I? CheckAndDoInteraction(
+        string tileDescription,
+        Func<Vector2I, bool> callback,
+        int radius = 1
+    )
+    {
+        TileMapLayer tilemap = WorldGenerator.Instance.walls;
+        Vector2 localPos = tilemap.ToLocal(Position);
+        Vector2 mouseDirection = (GetGlobalMousePosition() - GlobalPosition).Normalized();
+
+        Vector2I? bestPos = null;
+        float bestAngle = float.MaxValue;
+
+        foreach (Vector2I pos in GetTilesInRadius(tilemap, localPos, radius))
+        {
+            TileData data = tilemap.GetCellTileData(pos);
+            if (data != null && (string)data.GetCustomData("tileDescription") == tileDescription)
+            {
+                Vector2 worldPos = tilemap.MapToLocal(pos);
+                Vector2 toTile = (worldPos - GlobalPosition).Normalized();
+                float angle = Mathf.Abs(mouseDirection.AngleTo(toTile));
+                if (angle < bestAngle)
+                {
+                    bestAngle = angle;
+                    bestPos = pos;
+                }
+            }
+        }
+
+        if (bestPos != null)
+        {
+            if (callback(bestPos.Value))
+                return bestPos;
+        }
+        return null;
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         base._PhysicsProcess(delta);
         playerPath.positions.Add(Position);
         if (Velocity.Length() > 0.1f && !stepPlayer.Playing)
         {
-            if (APlusPathfinder.Instance.IsWater(GlobalPosition))
+            if (APlusPathfinder.Instance.IsWater(feet.GlobalPosition))
             {
                 PlayAudio(waterStepSound, stepPlayer);
             }
@@ -170,10 +227,12 @@ public partial class PlayerController : CharacterController
     {
         base.Kill();
         GD.Print("Dead");
-        if (immortal != true)
+        if (immortal == true)
         {
-            playerPath.characterCustomisation = characterPartSelection;
-            YourRunRestartsHere.Instance.PlayerDead(playerPath);
+            isDead = false;
+            return;
         }
+        playerPath.characterCustomisation = characterPartSelection;
+        YourRunRestartsHere.Instance.PlayerDead(playerPath);
     }
 }

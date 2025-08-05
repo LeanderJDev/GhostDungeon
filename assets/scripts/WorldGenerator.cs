@@ -599,12 +599,24 @@ public partial class WorldGenerator : Node2D
         if (groundTileMap.GetCellSourceId(position) == -1)
             return false; // No ground tile, space is not walkable
         TileData groundTileData = groundTileMap.GetCellTileData(position);
-        if (groundTileData != null && groundTileData.GetCollisionPolygonsCount(0) != 0)
+        if (
+            groundTileData != null
+            && (
+                groundTileData.GetCollisionPolygonsCount(0) != 0
+                || groundTileData.GetCollisionPolygonsCount(1) != 0
+            )
+        )
             return false;
         if (wallTileMap.GetCellSourceId(position) == -1)
             return true; // No wall tile, space is free
         TileData wallTileData = wallTileMap.GetCellTileData(position);
-        if (wallTileData != null && wallTileData.GetCollisionPolygonsCount(0) != 0)
+        if (
+            wallTileData != null
+            && (
+                wallTileData.GetCollisionPolygonsCount(0) != 0
+                || wallTileData.GetCollisionPolygonsCount(1) != 0
+            )
+        )
             return false;
         return true;
     }
