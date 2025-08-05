@@ -6,7 +6,7 @@ public partial class Projectile : CharacterBody2D
 {
     private int speed = 200;
     public Vector2 direction;
-    public int maxBounce;
+    public int maxBounce = 0;
     private bool _hitGhosts = false;
     public bool hitGhosts
     {
@@ -66,10 +66,10 @@ public partial class Projectile : CharacterBody2D
             }
             else
             {
+                if (maxBounce == 0)
+                    QueueFree();
                 direction = direction.Bounce(collisionInfo.GetNormal());
                 maxBounce--;
-                if (maxBounce <= 0)
-                    QueueFree();
             }
         }
         base._PhysicsProcess(delta);

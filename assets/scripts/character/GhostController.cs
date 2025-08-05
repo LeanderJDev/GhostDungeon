@@ -44,7 +44,7 @@ public partial class GhostController : CharacterController
     {
         targetPosition = ghostPath.positions[pathIndex];
         Vector2 direction = targetPosition - Position;
-        if (direction.Length() < 1)
+        if (direction.Length() < 5)
             direction = Vector2.Zero;
         moveDirection = direction.Normalized();
 

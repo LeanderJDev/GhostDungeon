@@ -12,7 +12,6 @@ Traps
 + Löcher füllen
 
 
-
 ToDo
 +Main Menu
 +OnWater Powerup
@@ -70,6 +69,12 @@ public partial class WorldGenerator : Node2D
 
     [Export]
     public Vector2I rockCoords = new Vector2I(0, 0);
+
+    [Export]
+    public AudioStream spawningSound;
+
+    [Export]
+    public AudioStreamPlayer spawningSoundPlayer;
     private Vector2I winChestCoords = new Vector2I(16, 4);
 
     private int generatedRoomCount = 0;
@@ -92,6 +97,9 @@ public partial class WorldGenerator : Node2D
 
     [Export]
     public int enemySpawningRateVariance = 5; // seconds variance
+
+    [Export]
+    public int maxEnemiesPerWave = 2; // Max enemies per wave
     private double enemySpawnTimer = 20.0;
     private int enemySpawnWave = 0;
     private Random enemyRandom = new();
@@ -170,17 +178,23 @@ public partial class WorldGenerator : Node2D
                 enemySpawningRate - enemySpawningRateVariance,
                 enemySpawningRate + enemySpawningRateVariance
             );
-            SpawnEnemies(0, 2, enemySpawnWave);
+            SpawnEnemies(0, maxEnemiesPerWave, enemySpawnWave);
         }
     }
 
     public void SpawnChest(Vector2I tilePosition)
     {
-        walls.SetCell(
-            tilePosition,
-            0,
-            new Vector2I(14, 6) // Assuming this is the chest tile
-        );
+        TileData data = walls.GetCellTileData(tilePosition);
+        if (
+            data != null
+            && (
+                (string)data.GetCustomData("tileDescription") == "chest"
+                || (string)data.GetCustomData("tileDescription") == "winchest"
+                || (string)data.GetCustomData("tileDescription") == "door"
+            )
+        )
+            return; // Already a chest or door here
+        walls.SetCell(tilePosition, 0, new Vector2I(14, 6));
     }
 
     int tries;
@@ -558,16 +572,17 @@ public partial class WorldGenerator : Node2D
                 {
                     continue;
                 }
-                if (
-                    PlayerController.Instance != null
-                    && PlayerController.Instance.Position.DistanceTo(
-                        worldPos * walls.TileSet.TileSize
-                    )
-                        < 16 * 3
-                )
-                {
-                    continue; // Skip if too close to player
-                }
+                // WARNING: This would conflict with deterministic spawning
+                // if (
+                //     PlayerController.Instance != null
+                //     && PlayerController.Instance.Position.DistanceTo(
+                //         worldPos * walls.TileSet.TileSize
+                //     )
+                //         < 16 * 3
+                // )
+                // {
+                //     continue; // Skip if too close to player
+                // }
                 if (enemies.Length > 0)
                 {
                     var enemyScene = enemies[enemyRoomRandom.Next(enemies.Length)];
@@ -583,6 +598,11 @@ public partial class WorldGenerator : Node2D
                     $"SpawnEnemies: Aborted after {maxEnemyTries} tries in room {room}, {enemyCount} enemies not spawned."
                 );
             }
+        }
+        if (seed != 0)
+        {
+            spawningSoundPlayer.Stream = spawningSound;
+            spawningSoundPlayer.Play();
         }
     }
 

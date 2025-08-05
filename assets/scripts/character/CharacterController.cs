@@ -33,13 +33,8 @@ public partial class CharacterController : CharacterBody2D
     public List<UpgradeItem> collectedUpgrades = [];
     public List<KeyItem> collectedKeys = [];
 
-    public bool CanWalkOnWater =>
-        collectedUpgrades.Any(x => x.upgradeType == UpgradeType.WalkOnWater);
-    public bool CanHitGhosts => collectedUpgrades.Any(x => x.upgradeType == UpgradeType.GhostShoot);
-    public bool HasBouncyProjectiles =>
-        collectedUpgrades.Any(x => x.upgradeType == UpgradeType.BouncyProjectiles);
-
-    public int maxProjectileBounces = 3;
+    public int maxProjectileBounces =>
+        collectedUpgrades.FindAll(x => x.upgradeType == UpgradeType.BouncyProjectiles).Count * 2;
 
     [Export]
     public int moveSpeed = 150;
@@ -318,8 +313,8 @@ public partial class CharacterController : CharacterBody2D
         Projectile newProjectile = (Projectile)projectile.Instantiate();
         newProjectile.Position = shootMarker.GlobalPosition + direction.Normalized() * 4;
         newProjectile.direction = direction;
-        newProjectile.maxBounce = HasBouncyProjectiles ? maxProjectileBounces : 0;
-        newProjectile.hitGhosts = CanHitGhosts;
+        newProjectile.maxBounce = maxProjectileBounces;
+        newProjectile.hitGhosts = HasUpgrade(UpgradeType.GhostShoot);
         newProjectile.SetShooter(this);
         GetParent().AddChild(newProjectile);
         string anim = sprites[0].Animation.ToString().Replace("shoot_", "idle_");
@@ -379,13 +374,13 @@ public partial class CharacterController : CharacterBody2D
         {
             collectedKeys[i].Position = new Vector2(i * keyDisplayWidth, 0);
         }
-        int upgradeOffset =
-            -(int)itemDisplayContainer.Position.X
-            - (collectedUpgrades.Count - 1) * upgradeDisplayWidth / 2;
         // Only display upgrades that are not WalkOnWater
         var displayUpgrades = collectedUpgrades
             .Where(u => u.upgradeType != UpgradeType.WalkOnWater)
             .ToList();
+        int upgradeOffset =
+            -(int)itemDisplayContainer.Position.X
+            - (displayUpgrades.Count - 1) * upgradeDisplayWidth / 2;
         for (int i = 0; i < displayUpgrades.Count; i++)
         {
             displayUpgrades[i].Position = new Vector2(i * upgradeDisplayWidth + upgradeOffset, 24);
@@ -419,10 +414,15 @@ public partial class CharacterController : CharacterBody2D
         sprites[(int)characterPartSelection.Hair].Visible = true;
         sprites[(int)characterPartSelection.Chest].Visible = true;
         sprites[(int)characterPartSelection.Pants].Visible = true;
-        if (!CanWalkOnWater)
+        if (!HasUpgrade(UpgradeType.WalkOnWater))
             sprites[(int)characterPartSelection.Feet].Visible = true;
         else
             sprites[1].Visible = true;
+    }
+
+    public bool HasUpgrade(UpgradeType upgradeType)
+    {
+        return collectedUpgrades.Any(x => x.upgradeType == upgradeType);
     }
 }
 

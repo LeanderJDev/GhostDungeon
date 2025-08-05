@@ -32,11 +32,11 @@ public partial class UpgradeView : Control
 
     public void UpdateView()
     {
-        if (playerController.CanWalkOnWater)
+        if (playerController.HasUpgrade(UpgradeType.WalkOnWater))
             walkOnWaterView.Visible = true;
-        if (playerController.CanHitGhosts)
+        if (playerController.HasUpgrade(UpgradeType.GhostShoot))
             hitGhostView.Visible = true;
-        if (playerController.HasBouncyProjectiles)
+        if (playerController.HasUpgrade(UpgradeType.BouncyProjectiles))
             bouncyProjectilesView.Visible = true;
     }
 }

@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://cketwg4mkdccm"]
 
-[ext_resource type="Script" uid="uid://yns72vg2la71" path="res://assets/scripts/character/MetaMain.cs" id="1_w5kng"]
+[ext_resource type="Script" uid="uid://yns72vg2la71" path="res://assets/scripts/MetaMain.cs" id="1_w5kng"]
 [ext_resource type="PackedScene" uid="uid://de7qkn4pdxk57" path="res://assets/scenes/main.tscn" id="2_8fi1s"]
 [ext_resource type="PackedScene" uid="uid://d181ai05nq7gv" path="res://assets/scenes/ghost.tscn" id="3_l03wl"]
 [ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/ui/UITheme.tres" id="4_mqhqy"]

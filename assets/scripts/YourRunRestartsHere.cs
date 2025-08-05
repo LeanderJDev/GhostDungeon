@@ -37,6 +37,7 @@ public partial class YourRunRestartsHere : Control
     {
         MetaMain.Instance.PlaySelectSound();
         GD.Print("restart");
+        PlayerController.Instance.immortal = false;
         PlayerController.Instance.Kill();
         MetaMain.SetGhostPath(ghostPath);
         MetaMain.Restart();
