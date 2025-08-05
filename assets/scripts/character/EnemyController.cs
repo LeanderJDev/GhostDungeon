@@ -247,7 +247,7 @@ public partial class EnemyController : CharacterController
     private bool HasLineOfSightToPlayer()
     {
         PhysicsDirectSpaceState2D space = GetWorld2D().DirectSpaceState;
-        Vector2 playerPos = player.GlobalPosition;
+        Vector2 playerPos = player.shootMarker.GlobalPosition;
         if (RayHitsPlayer(playerPos, space))
             return true;
         return false;
