@@ -21,6 +21,9 @@ public partial class CharacterSelection : CharacterController
     [Export]
     public Control characterSelectionContainer;
 
+    [Export]
+    public LineEdit characterNameEdit;
+
     private string anim = "idle";
     private string direction = "down";
 
@@ -28,6 +31,7 @@ public partial class CharacterSelection : CharacterController
     {
         GetTree().Paused = true; // Pause the game during character selection
         characterPartSelection = MetaMain.GetLastOutfit();
+        characterNameEdit.Text = characterPartSelection.Name;
         UpdateSprites();
     }
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://b8oodjpg5a6k1" path="res://assets/art/ui/UITheme.tres" id="1_k7sae"]
 [ext_resource type="PackedScene" uid="uid://d4bpnqcmrp5wd" path="res://assets/scenes/player.tscn" id="2_svfmr"]
-[ext_resource type="Script" uid="uid://p8ncq5il2ys1" path="res://assets/scripts/CharacterSelection.cs" id="3_w2a3r"]
+[ext_resource type="Script" uid="uid://p8ncq5il2ys1" path="res://assets/scripts/character/CharacterSelection.cs" id="3_w2a3r"]
 [ext_resource type="Texture2D" uid="uid://rkp0681r1vr1" path="res://assets/art/ui/arrow2.png" id="4_lsrrc"]
 [ext_resource type="Texture2D" uid="uid://c04ho565jovd7" path="res://assets/art/ui/arrow1.png" id="5_gfflm"]
 
@@ -36,12 +36,13 @@ offset_top = 60.0
 offset_right = 100.0
 offset_bottom = 100.0
 
-[node name="player" parent="Panel/Selection" node_paths=PackedStringArray("characterSelectionContainer") instance=ExtResource("2_svfmr")]
+[node name="player" parent="Panel/Selection" node_paths=PackedStringArray("characterSelectionContainer", "characterNameEdit") instance=ExtResource("2_svfmr")]
 process_mode = 3
 position = Vector2(20, 20)
 scale = Vector2(5, 5)
 script = ExtResource("3_w2a3r")
 characterSelectionContainer = NodePath("../../..")
+characterNameEdit = NodePath("../../LineEdit")
 
 [node name="CollisionShape2D" parent="Panel/Selection/player" index="0"]
 visible = false
